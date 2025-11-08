@@ -1,0 +1,131 @@
+{
+  "country": {
+    "code": "CA",
+    "name": "Canada",
+    "fiscalYearName": "Tax Year"
+  },
+  "taxPeriod": {
+    "startMonth": 1,
+    "startDay": 1,
+    "endMonth": 12,
+    "endDay": 31,
+    "description": "Canadian tax year runs from 1 January to 31 December"
+  },
+  "currency": {
+    "code": "CAD",
+    "symbol": "$",
+    "name": "Canadian Dollar",
+    "decimalSeparator": ".",
+    "thousandSeparator": ","
+  },
+  "taxAuthority": {
+    "name": "CRA",
+    "fullName": "Canada Revenue Agency",
+    "selfAssessmentForm": "T2125",
+    "formDescription": "Statement of Business or Professional Activities",
+    "website": "https://www.canada.ca/en/revenue-agency/services/forms-publications/forms/t2125.html"
+  },
+  "categories": {
+    "income": [
+      {
+        "id": "ca_income_business",
+        "name": "Business Income",
+        "icon": "attach_money",
+        "color": "#4CAF50",
+        "taxFormReference": "Line 8000",
+        "taxFormDescription": "Gross business income",
+        "displayOrder": 1,
+        "description": "Income from business activities, sales, or services"
+      }
+    ],
+    "expense": [
+      {
+        "id": "ca_expense_advertising",
+        "name": "Advertising",
+        "icon": "campaign",
+        "color": "#F44336",
+        "taxFormReference": "Line 8521",
+        "taxFormDescription": "Advertising",
+        "displayOrder": 10,
+        "description": "Advertising and marketing expenses"
+      },
+      {
+        "id": "ca_expense_vehicle",
+        "name": "Motor Vehicle",
+        "icon": "directions_car",
+        "color": "#F44336",
+        "taxFormReference": "Line 9281",
+        "taxFormDescription": "Motor vehicle expenses",
+        "displayOrder": 11,
+        "description": "Vehicle expenses for business use"
+      },
+      {
+        "id": "ca_expense_office",
+        "name": "Office Expenses",
+        "icon": "business_center",
+        "color": "#F44336",
+        "taxFormReference": "Line 8810",
+        "taxFormDescription": "Office expenses",
+        "displayOrder": 12,
+        "description": "Office supplies and expenses"
+      },
+      {
+        "id": "ca_expense_professional",
+        "name": "Professional Fees",
+        "icon": "gavel",
+        "color": "#F44336",
+        "taxFormReference": "Line 8862",
+        "taxFormDescription": "Legal, accounting, and other professional fees",
+        "displayOrder": 13,
+        "description": "Accountant, lawyer, consultant fees"
+      },
+      {
+        "id": "ca_expense_rent",
+        "name": "Rent",
+        "icon": "home",
+        "color": "#F44336",
+        "taxFormReference": "Line 8910",
+        "taxFormDescription": "Rent",
+        "displayOrder": 14,
+        "description": "Rent for business premises"
+      },
+      {
+        "id": "ca_expense_travel",
+        "name": "Travel",
+        "icon": "flight",
+        "color": "#F44336",
+        "taxFormReference": "Line 9200",
+        "taxFormDescription": "Travel",
+        "displayOrder": 15,
+        "description": "Business travel expenses"
+      },
+      {
+        "id": "ca_expense_telephone",
+        "name": "Telephone & Utilities",
+        "icon": "phone",
+        "color": "#F44336",
+        "taxFormReference": "Line 9220",
+        "taxFormDescription": "Telephone and utilities",
+        "displayOrder": 16,
+        "description": "Phone, internet, electricity, water"
+      },
+      {
+        "id": "ca_expense_other",
+        "name": "Other Expenses",
+        "icon": "receipt",
+        "color": "#F44336",
+        "taxFormReference": "Line 9270",
+        "taxFormDescription": "Other expenses",
+        "displayOrder": 17,
+        "description": "Miscellaneous business expenses"
+      }
+    ]
+  },
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2025-10-15",
+    "source": "CRA Form T2125",
+    "notes": "Categories based on Canadian CRA T2125 form for self-employed individuals"
+  }
+}
+

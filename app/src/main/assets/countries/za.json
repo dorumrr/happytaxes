@@ -1,0 +1,21 @@
+{
+  "country": {"code": "ZA", "name": "South Africa", "fiscalYearName": "Fiscal Year"},
+  "taxPeriod": {"startMonth": 3, "startDay": 1, "endMonth": 2, "endDay": 28, "description": "South Africa fiscal year runs from 1 March to 28 February"},
+  "currency": {"code": "ZAR", "symbol": "R", "name": "South African Rand", "decimalSeparator": ".", "thousandSeparator": ","},
+  "taxAuthority": {"name": "Tax Authority", "fullName": "South Africa Tax Authority", "selfAssessmentForm": "N/A", "formDescription": "Consult local tax authority for requirements", "website": ""},
+  "categories": {
+    "income": [
+      {"id": "za_income_sales", "name": "Sales/Revenue", "icon": "shopping_cart", "color": "#4CAF50", "displayOrder": 1, "description": "Income from sales"},
+      {"id": "za_income_other", "name": "Other Income", "icon": "attach_money", "color": "#4CAF50", "displayOrder": 2, "description": "Other income"}
+    ],
+    "expense": [
+      {"id": "za_expense_cogs", "name": "Cost of Goods", "icon": "inventory", "color": "#F44336", "displayOrder": 10, "description": "Cost of goods"},
+      {"id": "za_expense_travel", "name": "Travel", "icon": "directions_car", "color": "#F44336", "displayOrder": 11, "description": "Travel expenses"},
+      {"id": "za_expense_office", "name": "Office Supplies", "icon": "phone", "color": "#F44336", "displayOrder": 12, "description": "Office expenses"},
+      {"id": "za_expense_professional", "name": "Professional Services", "icon": "gavel", "color": "#F44336", "displayOrder": 13, "description": "Professional services"},
+      {"id": "za_expense_other", "name": "Other Expenses", "icon": "receipt", "color": "#F44336", "displayOrder": 14, "description": "Other expenses"}
+    ]
+  },
+  "metadata": {"version": "1.0", "lastUpdated": "2025-10-22", "source": "Standard business categories", "notes": "Basic categories for South Africa businesses"}
+}
+

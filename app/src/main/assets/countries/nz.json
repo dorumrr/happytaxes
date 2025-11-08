@@ -1,0 +1,131 @@
+{
+  "country": {
+    "code": "NZ",
+    "name": "New Zealand",
+    "fiscalYearName": "Tax Year"
+  },
+  "taxPeriod": {
+    "startMonth": 4,
+    "startDay": 1,
+    "endMonth": 3,
+    "endDay": 31,
+    "description": "New Zealand tax year runs from 1 April to 31 March"
+  },
+  "currency": {
+    "code": "NZD",
+    "symbol": "$",
+    "name": "New Zealand Dollar",
+    "decimalSeparator": ".",
+    "thousandSeparator": ","
+  },
+  "taxAuthority": {
+    "name": "IRD",
+    "fullName": "Inland Revenue Department",
+    "selfAssessmentForm": "IR3",
+    "formDescription": "Individual income tax return",
+    "website": "https://www.ird.govt.nz/income-tax/income-tax-for-businesses-and-organisations/types-of-business-expenses"
+  },
+  "categories": {
+    "income": [
+      {
+        "id": "nz_income_business",
+        "name": "Business Income",
+        "icon": "attach_money",
+        "color": "#4CAF50",
+        "taxFormReference": "Income",
+        "taxFormDescription": "Business income",
+        "displayOrder": 1,
+        "description": "Income from business activities, sales, or services"
+      }
+    ],
+    "expense": [
+      {
+        "id": "nz_expense_advertising",
+        "name": "Advertising",
+        "icon": "campaign",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Advertising expenses",
+        "displayOrder": 10,
+        "description": "Advertising and marketing expenses"
+      },
+      {
+        "id": "nz_expense_vehicle",
+        "name": "Motor Vehicle",
+        "icon": "directions_car",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Motor vehicle expenses",
+        "displayOrder": 11,
+        "description": "Vehicle expenses for business use"
+      },
+      {
+        "id": "nz_expense_office",
+        "name": "Office Expenses",
+        "icon": "business_center",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Office expenses and supplies",
+        "displayOrder": 12,
+        "description": "Office supplies and expenses"
+      },
+      {
+        "id": "nz_expense_professional",
+        "name": "Professional Fees",
+        "icon": "gavel",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Legal, accounting, and professional fees",
+        "displayOrder": 13,
+        "description": "Accountant, lawyer, consultant fees"
+      },
+      {
+        "id": "nz_expense_rent",
+        "name": "Rent",
+        "icon": "home",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Rent for business premises",
+        "displayOrder": 14,
+        "description": "Rent for business premises"
+      },
+      {
+        "id": "nz_expense_travel",
+        "name": "Travel",
+        "icon": "flight",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Travel expenses",
+        "displayOrder": 15,
+        "description": "Business travel expenses"
+      },
+      {
+        "id": "nz_expense_utilities",
+        "name": "Utilities",
+        "icon": "phone",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Phone, internet, and utilities",
+        "displayOrder": 16,
+        "description": "Phone, internet, electricity, water"
+      },
+      {
+        "id": "nz_expense_other",
+        "name": "Other Expenses",
+        "icon": "receipt",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Other deductible expenses",
+        "displayOrder": 17,
+        "description": "Miscellaneous business expenses"
+      }
+    ]
+  },
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2025-10-15",
+    "source": "IRD business expense guidelines",
+    "notes": "Categories based on New Zealand IRD deductible business expenses for self-employed individuals"
+  }
+}
+

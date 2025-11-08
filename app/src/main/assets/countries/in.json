@@ -1,0 +1,21 @@
+{
+  "country": {"code": "IN", "name": "India", "fiscalYearName": "Fiscal Year"},
+  "taxPeriod": {"startMonth": 4, "startDay": 1, "endMonth": 3, "endDay": 31, "description": "India fiscal year runs from 1 April to 31 March"},
+  "currency": {"code": "INR", "symbol": "₹", "name": "Indian Rupee", "decimalSeparator": ".", "thousandSeparator": ","},
+  "taxAuthority": {"name": "Tax Authority", "fullName": "India Tax Authority", "selfAssessmentForm": "N/A", "formDescription": "Consult local tax authority for requirements", "website": ""},
+  "categories": {
+    "income": [
+      {"id": "in_income_sales", "name": "Sales/Revenue", "icon": "shopping_cart", "color": "#4CAF50", "displayOrder": 1, "description": "Income from sales"},
+      {"id": "in_income_other", "name": "Other Income", "icon": "attach_money", "color": "#4CAF50", "displayOrder": 2, "description": "Other income"}
+    ],
+    "expense": [
+      {"id": "in_expense_cogs", "name": "Cost of Goods", "icon": "inventory", "color": "#F44336", "displayOrder": 10, "description": "Cost of goods"},
+      {"id": "in_expense_travel", "name": "Travel", "icon": "directions_car", "color": "#F44336", "displayOrder": 11, "description": "Travel expenses"},
+      {"id": "in_expense_office", "name": "Office Supplies", "icon": "phone", "color": "#F44336", "displayOrder": 12, "description": "Office expenses"},
+      {"id": "in_expense_professional", "name": "Professional Services", "icon": "gavel", "color": "#F44336", "displayOrder": 13, "description": "Professional services"},
+      {"id": "in_expense_other", "name": "Other Expenses", "icon": "receipt", "color": "#F44336", "displayOrder": 14, "description": "Other expenses"}
+    ]
+  },
+  "metadata": {"version": "1.0", "lastUpdated": "2025-10-22", "source": "Standard business categories", "notes": "Basic categories for India businesses"}
+}
+

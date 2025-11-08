@@ -1,0 +1,191 @@
+{
+  "country": {
+    "code": "GB",
+    "name": "United Kingdom",
+    "fiscalYearName": "Tax Year"
+  },
+  "taxPeriod": {
+    "startMonth": 4,
+    "startDay": 6,
+    "endMonth": 4,
+    "endDay": 5,
+    "description": "UK tax year runs from 6 April to 5 April"
+  },
+  "currency": {
+    "code": "GBP",
+    "symbol": "£",
+    "name": "British Pound Sterling",
+    "decimalSeparator": ".",
+    "thousandSeparator": ","
+  },
+  "taxAuthority": {
+    "name": "HMRC",
+    "fullName": "His Majesty's Revenue and Customs",
+    "selfAssessmentForm": "SA103",
+    "formDescription": "Self-employment (full)",
+    "website": "https://www.gov.uk/self-assessment-tax-returns"
+  },
+  "categories": {
+    "income": [
+      {
+        "id": "gb_income_sales",
+        "name": "Sales/Turnover",
+        "icon": "shopping_cart",
+        "color": "#4CAF50",
+        "taxFormReference": "Box 15",
+        "taxFormDescription": "Sales/business income (turnover)",
+        "displayOrder": 1,
+        "description": "Income from sales of goods or services"
+      },
+      {
+        "id": "gb_income_other",
+        "name": "Other Income",
+        "icon": "attach_money",
+        "color": "#4CAF50",
+        "taxFormReference": "Box 16",
+        "taxFormDescription": "Other business income",
+        "displayOrder": 2,
+        "description": "Other business-related income"
+      }
+    ],
+    "expense": [
+      {
+        "id": "gb_expense_cogs",
+        "name": "Cost of Goods",
+        "icon": "inventory",
+        "color": "#F44336",
+        "taxFormReference": "Box 17",
+        "taxFormDescription": "Cost of goods bought for resale or goods used",
+        "displayOrder": 10,
+        "description": "Cost of goods sold or materials used"
+      },
+      {
+        "id": "gb_expense_construction",
+        "name": "Construction Industry Subcontractors",
+        "icon": "construction",
+        "color": "#F44336",
+        "taxFormReference": "Box 18",
+        "taxFormDescription": "Construction industry - subcontractors",
+        "displayOrder": 11,
+        "description": "Payments to construction subcontractors"
+      },
+      {
+        "id": "gb_expense_wages",
+        "name": "Wages/Salaries",
+        "icon": "people",
+        "color": "#F44336",
+        "taxFormReference": "Box 19",
+        "taxFormDescription": "Wages, salaries and other staff costs",
+        "displayOrder": 12,
+        "description": "Employee wages and related costs"
+      },
+      {
+        "id": "gb_expense_travel",
+        "name": "Car/Van/Travel",
+        "icon": "directions_car",
+        "color": "#F44336",
+        "taxFormReference": "Box 20",
+        "taxFormDescription": "Car, van and travel expenses",
+        "displayOrder": 13,
+        "description": "Business travel and vehicle expenses"
+      },
+      {
+        "id": "gb_expense_rent",
+        "name": "Rent/Rates/Power",
+        "icon": "home",
+        "color": "#F44336",
+        "taxFormReference": "Box 21",
+        "taxFormDescription": "Rent, rates, power and insurance costs",
+        "displayOrder": 14,
+        "description": "Office rent, utilities, and insurance"
+      },
+      {
+        "id": "gb_expense_repairs",
+        "name": "Repairs/Renewals",
+        "icon": "build",
+        "color": "#F44336",
+        "taxFormReference": "Box 22",
+        "taxFormDescription": "Repairs and renewals of property and equipment",
+        "displayOrder": 15,
+        "description": "Maintenance and repairs"
+      },
+      {
+        "id": "gb_expense_office",
+        "name": "Phone/Fax/Stationery",
+        "icon": "phone",
+        "color": "#F44336",
+        "taxFormReference": "Box 23",
+        "taxFormDescription": "Phone, fax, stationery and other office costs",
+        "displayOrder": 16,
+        "description": "Office supplies and communications"
+      },
+      {
+        "id": "gb_expense_marketing",
+        "name": "Advertising/Marketing",
+        "icon": "campaign",
+        "color": "#F44336",
+        "taxFormReference": "Box 24",
+        "taxFormDescription": "Advertising and business entertainment costs",
+        "displayOrder": 17,
+        "description": "Marketing and advertising expenses"
+      },
+      {
+        "id": "gb_expense_interest",
+        "name": "Interest/Finance",
+        "icon": "account_balance",
+        "color": "#F44336",
+        "taxFormReference": "Box 25",
+        "taxFormDescription": "Interest on bank and other loans",
+        "displayOrder": 18,
+        "description": "Interest on business loans"
+      },
+      {
+        "id": "gb_expense_bank",
+        "name": "Bank/Credit Card/Finance Charges",
+        "icon": "credit_card",
+        "color": "#F44336",
+        "taxFormReference": "Box 26",
+        "taxFormDescription": "Bank, credit card and other financial charges",
+        "displayOrder": 19,
+        "description": "Banking fees and charges"
+      },
+      {
+        "id": "gb_expense_bad_debts",
+        "name": "Irrecoverable Debts",
+        "icon": "money_off",
+        "color": "#F44336",
+        "taxFormReference": "Box 27",
+        "taxFormDescription": "Irrecoverable debts written off",
+        "displayOrder": 20,
+        "description": "Bad debts written off"
+      },
+      {
+        "id": "gb_expense_professional",
+        "name": "Accountancy/Legal/Professional",
+        "icon": "gavel",
+        "color": "#F44336",
+        "taxFormReference": "Box 28",
+        "taxFormDescription": "Accountancy, legal and other professional fees",
+        "displayOrder": 21,
+        "description": "Professional services fees"
+      },
+      {
+        "id": "gb_expense_other",
+        "name": "Other Business Expenses",
+        "icon": "receipt",
+        "color": "#F44336",
+        "taxFormReference": "Box 29",
+        "taxFormDescription": "Other allowable business expenses",
+        "displayOrder": 22,
+        "description": "Miscellaneous business expenses"
+      }
+    ]
+  },
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2025-10-15",
+    "source": "HMRC SA103 Self Assessment form",
+    "notes": "Categories based on UK HMRC Self Assessment SA103 form for self-employment"
+  }
+}
+

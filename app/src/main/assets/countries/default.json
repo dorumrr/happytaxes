@@ -1,0 +1,101 @@
+{
+  "country": {
+    "code": "OTHER",
+    "name": "Other",
+    "fiscalYearName": "Fiscal Year"
+  },
+  "taxPeriod": {
+    "startMonth": 1,
+    "startDay": 1,
+    "endMonth": 12,
+    "endDay": 31,
+    "description": "Default fiscal year runs from 1 January to 31 December (customizable)"
+  },
+  "currency": {
+    "code": "USD",
+    "symbol": "$",
+    "name": "US Dollar",
+    "decimalSeparator": ".",
+    "thousandSeparator": ","
+  },
+  "taxAuthority": {
+    "name": "Tax Authority",
+    "fullName": "Local Tax Authority",
+    "selfAssessmentForm": "N/A",
+    "formDescription": "Consult your local tax authority",
+    "website": ""
+  },
+  "categories": {
+    "income": [
+      {
+        "id": "default_income_business",
+        "name": "Business Income",
+        "icon": "attach_money",
+        "color": "#4CAF50",
+        "taxFormReference": "Income",
+        "taxFormDescription": "Income from sales of goods or services",
+        "displayOrder": 1,
+        "description": "Income from business activities, sales, or services"
+      }
+    ],
+    "expense": [
+      {
+        "id": "default_expense_office",
+        "name": "Office & Supplies",
+        "icon": "business_center",
+        "color": "#F44336",
+        "taxFormReference": "Expense",
+        "taxFormDescription": "Office supplies, equipment, software, subscriptions",
+        "displayOrder": 10,
+        "description": "Office supplies, equipment, software, internet, phone"
+      },
+      {
+        "id": "default_expense_travel",
+        "name": "Travel & Transportation",
+        "icon": "directions_car",
+        "color": "#F44336",
+        "taxFormReference": "Expense",
+        "taxFormDescription": "Business travel and transportation expenses",
+        "displayOrder": 11,
+        "description": "Business travel, mileage, parking, accommodation"
+      },
+      {
+        "id": "default_expense_professional",
+        "name": "Professional Services",
+        "icon": "gavel",
+        "color": "#F44336",
+        "taxFormReference": "Expense",
+        "taxFormDescription": "Accountancy, legal, and consultant fees",
+        "displayOrder": 12,
+        "description": "Accountant, lawyer, consultant, contractor fees"
+      },
+      {
+        "id": "default_expense_marketing",
+        "name": "Marketing & Advertising",
+        "icon": "campaign",
+        "color": "#F44336",
+        "taxFormReference": "Expense",
+        "taxFormDescription": "Advertising, website, promotional materials",
+        "displayOrder": 13,
+        "description": "Advertising, website, business cards, promotional materials"
+      },
+      {
+        "id": "default_expense_other",
+        "name": "Other Business Expenses",
+        "icon": "receipt",
+        "color": "#F44336",
+        "taxFormReference": "Expense",
+        "taxFormDescription": "Miscellaneous business expenses",
+        "displayOrder": 14,
+        "description": "Miscellaneous business expenses"
+      }
+    ]
+  },
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2025-10-15",
+    "source": "Universal categories for freelancers and self-employed",
+    "notes": "Minimal default categories that work across most jurisdictions. Users can customize as needed."
+  }
+}
+

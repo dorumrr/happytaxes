@@ -1,0 +1,141 @@
+{
+  "country": {
+    "code": "RO",
+    "name": "Romania",
+    "fiscalYearName": "Fiscal Year"
+  },
+  "taxPeriod": {
+    "startMonth": 1,
+    "startDay": 1,
+    "endMonth": 12,
+    "endDay": 31,
+    "description": "Romanian fiscal year runs from 1 January to 31 December"
+  },
+  "currency": {
+    "code": "RON",
+    "symbol": "lei",
+    "name": "Romanian Leu",
+    "decimalSeparator": ",",
+    "thousandSeparator": "."
+  },
+  "taxAuthority": {
+    "name": "ANAF",
+    "fullName": "Agenția Națională de Administrare Fiscală",
+    "selfAssessmentForm": "PFA Declaration",
+    "formDescription": "Persoană Fizică Autorizată (Authorized Natural Person)",
+    "website": "https://www.anaf.ro/"
+  },
+  "categories": {
+    "income": [
+      {
+        "id": "ro_income_services",
+        "name": "Business Income/Services",
+        "icon": "attach_money",
+        "color": "#4CAF50",
+        "taxFormReference": "Income",
+        "taxFormDescription": "Income from independent activities and services",
+        "displayOrder": 1,
+        "description": "Income from freelance work, services, or business activities"
+      }
+    ],
+    "expense": [
+      {
+        "id": "ro_expense_office",
+        "name": "Office & Supplies",
+        "icon": "business_center",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Office materials, equipment, software, and supplies",
+        "displayOrder": 10,
+        "description": "Office supplies, equipment, software subscriptions"
+      },
+      {
+        "id": "ro_expense_travel",
+        "name": "Travel & Transportation",
+        "icon": "directions_car",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Business travel and transportation expenses",
+        "displayOrder": 11,
+        "description": "Business travel, mileage, parking, public transport"
+      },
+      {
+        "id": "ro_expense_professional",
+        "name": "Professional Services",
+        "icon": "gavel",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Accountancy, legal, and consultant fees",
+        "displayOrder": 12,
+        "description": "Accountant, lawyer, consultant fees"
+      },
+      {
+        "id": "ro_expense_marketing",
+        "name": "Marketing & Advertising",
+        "icon": "campaign",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Marketing and advertising expenses",
+        "displayOrder": 13,
+        "description": "Advertising, website, business cards, promotional materials"
+      },
+      {
+        "id": "ro_expense_rent",
+        "name": "Rent & Utilities",
+        "icon": "home",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Office rent, electricity, water, heating",
+        "displayOrder": 14,
+        "description": "Office rent, electricity, water, heating, insurance"
+      },
+      {
+        "id": "ro_expense_telecom",
+        "name": "Telecommunications",
+        "icon": "phone",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Phone and internet expenses",
+        "displayOrder": 15,
+        "description": "Phone, internet, mobile data"
+      },
+      {
+        "id": "ro_expense_bank",
+        "name": "Bank & Financial Charges",
+        "icon": "account_balance",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Bank fees and financial charges",
+        "displayOrder": 16,
+        "description": "Bank fees, transaction charges, currency conversion fees"
+      },
+      {
+        "id": "ro_expense_training",
+        "name": "Professional Development & Training",
+        "icon": "school",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Professional training and development expenses",
+        "displayOrder": 17,
+        "description": "Courses, certifications, professional development"
+      },
+      {
+        "id": "ro_expense_other",
+        "name": "Other Business Expenses",
+        "icon": "receipt",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Other allowable business expenses",
+        "displayOrder": 18,
+        "description": "Miscellaneous business expenses"
+      }
+    ]
+  },
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2025-10-15",
+    "source": "Romanian Fiscal Code and PFA regulations",
+    "notes": "Categories for Romanian freelancers (PFA - Persoană Fizică Autorizată). Based on Romanian Fiscal Code deductible expenses."
+  }
+}
+

@@ -1,0 +1,39 @@
+HappyTaxes is a private, offline-first cash-basis bookkeeping app with receipt OCR. Made for freelancers, sole traders, small business, even personal finance. Track your finances, prepare for tax time, and keep your data yours.
+
+<b>KEY FEATURES</b>
+
+• Track income and expenses with receipts
+• Generate compliant Profit & Loss reports
+• Maintain 6+ years of records
+• Receipt capture with OCR (Tesseract - on-device only)
+• Local backup & restore (ZIP export/import)
+• Soft delete with 30-day recovery
+• Work completely offline - no internet required
+• 100% private - your data never leaves your device
+
+<b>PRIVACY FIRST</b>
+
+• No data collection
+• No tracking or analytics
+• No ads
+• No cloud sync
+• All data stored locally on your device
+• You have complete control over your data
+
+<b>PERFECT FOR</b>
+
+• Online sellers tracking income and costs
+• Freelancers managing business finances
+• Small businesses needing simple bookkeeping
+• Personal expense tracking and budgeting
+• Anyone preparing for tax time
+• People who value privacy and offline functionality
+
+<b>OPEN SOURCE</b>
+
+Source code: https://github.com/dorumrr/happytaxes
+License: MIT
+Issues: https://github.com/dorumrr/happytaxes/issues
+
+Late nights for brighter days. 
+Created by Doru Moraru

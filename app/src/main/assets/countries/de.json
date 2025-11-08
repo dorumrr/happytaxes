@@ -1,0 +1,97 @@
+{
+  "country": {
+    "code": "DE",
+    "name": "Germany",
+    "fiscalYearName": "Geschäftsjahr"
+  },
+  "taxPeriod": {
+    "startMonth": 1,
+    "startDay": 1,
+    "endMonth": 12,
+    "endDay": 31,
+    "description": "German fiscal year runs from 1 January to 31 December"
+  },
+  "currency": {
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Euro",
+    "decimalSeparator": ",",
+    "thousandSeparator": "."
+  },
+  "taxAuthority": {
+    "name": "Finanzamt",
+    "fullName": "Finanzamt",
+    "selfAssessmentForm": "N/A",
+    "formDescription": "Consult Finanzamt for tax requirements",
+    "website": "https://www.bundesfinanzministerium.de"
+  },
+  "categories": {
+    "income": [
+      {
+        "id": "de_income_sales",
+        "name": "Umsatzerlöse",
+        "icon": "shopping_cart",
+        "color": "#4CAF50",
+        "displayOrder": 1,
+        "description": "Sales revenue"
+      },
+      {
+        "id": "de_income_other",
+        "name": "Sonstige Erträge",
+        "icon": "attach_money",
+        "color": "#4CAF50",
+        "displayOrder": 2,
+        "description": "Other income"
+      }
+    ],
+    "expense": [
+      {
+        "id": "de_expense_cogs",
+        "name": "Wareneinkauf",
+        "icon": "inventory",
+        "color": "#F44336",
+        "displayOrder": 10,
+        "description": "Cost of goods"
+      },
+      {
+        "id": "de_expense_travel",
+        "name": "Reisekosten",
+        "icon": "directions_car",
+        "color": "#F44336",
+        "displayOrder": 11,
+        "description": "Travel expenses"
+      },
+      {
+        "id": "de_expense_office",
+        "name": "Bürokosten",
+        "icon": "phone",
+        "color": "#F44336",
+        "displayOrder": 12,
+        "description": "Office expenses"
+      },
+      {
+        "id": "de_expense_professional",
+        "name": "Beratungskosten",
+        "icon": "gavel",
+        "color": "#F44336",
+        "displayOrder": 13,
+        "description": "Professional services"
+      },
+      {
+        "id": "de_expense_other",
+        "name": "Sonstige Kosten",
+        "icon": "receipt",
+        "color": "#F44336",
+        "displayOrder": 14,
+        "description": "Other expenses"
+      }
+    ]
+  },
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2025-10-22",
+    "source": "Standard business categories",
+    "notes": "Basic categories for German businesses"
+  }
+}
+

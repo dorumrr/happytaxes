@@ -1,0 +1,131 @@
+{
+  "country": {
+    "code": "AU",
+    "name": "Australia",
+    "fiscalYearName": "Financial Year"
+  },
+  "taxPeriod": {
+    "startMonth": 7,
+    "startDay": 1,
+    "endMonth": 6,
+    "endDay": 30,
+    "description": "Australian financial year runs from 1 July to 30 June"
+  },
+  "currency": {
+    "code": "AUD",
+    "symbol": "$",
+    "name": "Australian Dollar",
+    "decimalSeparator": ".",
+    "thousandSeparator": ","
+  },
+  "taxAuthority": {
+    "name": "ATO",
+    "fullName": "Australian Taxation Office",
+    "selfAssessmentForm": "Individual Tax Return",
+    "formDescription": "Business and professional items schedule",
+    "website": "https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/deductions-you-can-claim/business-expenses"
+  },
+  "categories": {
+    "income": [
+      {
+        "id": "au_income_business",
+        "name": "Business Income",
+        "icon": "attach_money",
+        "color": "#4CAF50",
+        "taxFormReference": "Item 13",
+        "taxFormDescription": "Business income",
+        "displayOrder": 1,
+        "description": "Income from business activities, sales, or services"
+      }
+    ],
+    "expense": [
+      {
+        "id": "au_expense_advertising",
+        "name": "Advertising",
+        "icon": "campaign",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Advertising expenses",
+        "displayOrder": 10,
+        "description": "Advertising and marketing expenses"
+      },
+      {
+        "id": "au_expense_vehicle",
+        "name": "Motor Vehicle",
+        "icon": "directions_car",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Motor vehicle expenses",
+        "displayOrder": 11,
+        "description": "Vehicle expenses for business use"
+      },
+      {
+        "id": "au_expense_office",
+        "name": "Office Expenses",
+        "icon": "business_center",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Office expenses and supplies",
+        "displayOrder": 12,
+        "description": "Office supplies and expenses"
+      },
+      {
+        "id": "au_expense_professional",
+        "name": "Professional Fees",
+        "icon": "gavel",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Legal, accounting, and professional fees",
+        "displayOrder": 13,
+        "description": "Accountant, lawyer, consultant fees"
+      },
+      {
+        "id": "au_expense_rent",
+        "name": "Rent",
+        "icon": "home",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Rent for business premises",
+        "displayOrder": 14,
+        "description": "Rent for business premises"
+      },
+      {
+        "id": "au_expense_travel",
+        "name": "Travel",
+        "icon": "flight",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Travel expenses",
+        "displayOrder": 15,
+        "description": "Business travel expenses"
+      },
+      {
+        "id": "au_expense_utilities",
+        "name": "Utilities",
+        "icon": "phone",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Phone, internet, and utilities",
+        "displayOrder": 16,
+        "description": "Phone, internet, electricity, water"
+      },
+      {
+        "id": "au_expense_other",
+        "name": "Other Expenses",
+        "icon": "receipt",
+        "color": "#F44336",
+        "taxFormReference": "Deductible",
+        "taxFormDescription": "Other deductible expenses",
+        "displayOrder": 17,
+        "description": "Miscellaneous business expenses"
+      }
+    ]
+  },
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2025-10-15",
+    "source": "ATO business expense guidelines",
+    "notes": "Categories based on Australian ATO deductible business expenses for self-employed individuals"
+  }
+}
+

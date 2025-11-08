@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HappyTaxes</string>
+    
+    <!-- Navigation -->
+    <string name="nav_ledger">Ledger</string>
+    <string name="nav_reports">Reports</string>
+    <string name="nav_settings">Settings</string>
+    
+    <!-- Transaction types -->
+    <string name="transaction_type_income">Income</string>
+    <string name="transaction_type_expense">Expense</string>
+    
+    <!-- Common actions -->
+    <string name="action_add">Add</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_restore">Restore</string>
+    
+    <!-- Transaction fields -->
+    <string name="field_date">Date</string>
+    <string name="field_amount">Amount</string>
+    <string name="field_category">Category</string>
+    <string name="field_description">Description</string>
+    <string name="field_notes">Notes</string>
+    <string name="field_receipt">Receipt</string>
+    
+    <!-- Status -->
+    <string name="status_draft">Draft</string>
+    <string name="status_deleted">Deleted</string>
+    
+    <!-- Errors -->
+    <string name="error_required_field">This field is required</string>
+    <string name="error_invalid_amount">Invalid amount</string>
+    <string name="error_receipt_required">Receipt required for expenses</string>
+    
+    <!-- Content descriptions -->
+    <string name="cd_add_transaction">Add transaction</string>
+    <string name="cd_transaction_receipt">Transaction receipt</string>
+</resources>
+

@@ -1,0 +1,141 @@
+{
+  "country": {
+    "code": "US",
+    "name": "United States",
+    "fiscalYearName": "Tax Year"
+  },
+  "taxPeriod": {
+    "startMonth": 1,
+    "startDay": 1,
+    "endMonth": 12,
+    "endDay": 31,
+    "description": "US tax year runs from 1 January to 31 December"
+  },
+  "currency": {
+    "code": "USD",
+    "symbol": "$",
+    "name": "US Dollar",
+    "decimalSeparator": ".",
+    "thousandSeparator": ","
+  },
+  "taxAuthority": {
+    "name": "IRS",
+    "fullName": "Internal Revenue Service",
+    "selfAssessmentForm": "Schedule C",
+    "formDescription": "Profit or Loss from Business (Sole Proprietorship)",
+    "website": "https://www.irs.gov/forms-pubs/about-schedule-c-form-1040"
+  },
+  "categories": {
+    "income": [
+      {
+        "id": "us_income_business",
+        "name": "Business Income",
+        "icon": "attach_money",
+        "color": "#4CAF50",
+        "taxFormReference": "Line 1",
+        "taxFormDescription": "Gross receipts or sales",
+        "displayOrder": 1,
+        "description": "Income from business activities, sales, or services"
+      }
+    ],
+    "expense": [
+      {
+        "id": "us_expense_advertising",
+        "name": "Advertising",
+        "icon": "campaign",
+        "color": "#F44336",
+        "taxFormReference": "Line 8",
+        "taxFormDescription": "Advertising",
+        "displayOrder": 10,
+        "description": "Advertising and marketing expenses"
+      },
+      {
+        "id": "us_expense_car",
+        "name": "Car & Truck",
+        "icon": "directions_car",
+        "color": "#F44336",
+        "taxFormReference": "Line 9",
+        "taxFormDescription": "Car and truck expenses",
+        "displayOrder": 11,
+        "description": "Vehicle expenses for business use"
+      },
+      {
+        "id": "us_expense_office",
+        "name": "Office Expense",
+        "icon": "business_center",
+        "color": "#F44336",
+        "taxFormReference": "Line 18",
+        "taxFormDescription": "Office expense",
+        "displayOrder": 12,
+        "description": "Office supplies and expenses"
+      },
+      {
+        "id": "us_expense_professional",
+        "name": "Legal & Professional Services",
+        "icon": "gavel",
+        "color": "#F44336",
+        "taxFormReference": "Line 17",
+        "taxFormDescription": "Legal and professional services",
+        "displayOrder": 13,
+        "description": "Accountant, lawyer, consultant fees"
+      },
+      {
+        "id": "us_expense_rent",
+        "name": "Rent or Lease",
+        "icon": "home",
+        "color": "#F44336",
+        "taxFormReference": "Line 20",
+        "taxFormDescription": "Rent or lease (vehicles, machinery, equipment)",
+        "displayOrder": 14,
+        "description": "Rent or lease of business property"
+      },
+      {
+        "id": "us_expense_supplies",
+        "name": "Supplies",
+        "icon": "inventory",
+        "color": "#F44336",
+        "taxFormReference": "Line 22",
+        "taxFormDescription": "Supplies (not included in Part III)",
+        "displayOrder": 15,
+        "description": "Business supplies"
+      },
+      {
+        "id": "us_expense_travel",
+        "name": "Travel",
+        "icon": "flight",
+        "color": "#F44336",
+        "taxFormReference": "Line 24a",
+        "taxFormDescription": "Travel",
+        "displayOrder": 16,
+        "description": "Business travel expenses"
+      },
+      {
+        "id": "us_expense_utilities",
+        "name": "Utilities",
+        "icon": "power",
+        "color": "#F44336",
+        "taxFormReference": "Line 25",
+        "taxFormDescription": "Utilities",
+        "displayOrder": 17,
+        "description": "Electricity, water, phone, internet"
+      },
+      {
+        "id": "us_expense_other",
+        "name": "Other Expenses",
+        "icon": "receipt",
+        "color": "#F44336",
+        "taxFormReference": "Line 27a",
+        "taxFormDescription": "Other expenses",
+        "displayOrder": 18,
+        "description": "Miscellaneous business expenses"
+      }
+    ]
+  },
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2025-10-15",
+    "source": "IRS Schedule C (Form 1040)",
+    "notes": "Categories based on US IRS Schedule C for sole proprietors and self-employed individuals"
+  }
+}
+

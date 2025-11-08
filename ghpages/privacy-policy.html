@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Privacy Policy for HappyTaxes - A cash basis accounting app">
+    <title>Privacy Policy - HappyTaxes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            /* background: linear-gradient(135deg, #0065C2 0%, #004a8f 100%); */
+            background: linear-gradient(135deg, #f0f8ff 0%, #e3f2fd 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 0;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .nav {
+            background: linear-gradient(135deg, #0065C2 0%, #004a8f 100%);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.95em;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .content {
+            padding: 50px 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .app-icon {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 25px;
+            border-radius: 28px;
+            box-shadow: 0 10px 30px rgba(0, 101, 194, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .app-icon:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            color: #0065C2;
+            font-size: 3em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .page-title {
+            font-size: 1.3em;
+            color: #666;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        h2 {
+            color: #0065C2;
+            font-size: 2em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+            font-size: 1.05em;
+        }
+
+        ul {
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+
+        ul li {
+            margin-bottom: 12px;
+            line-height: 1.7;
+            font-size: 1.05em;
+        }
+
+        .intro {
+            font-size: 1.15em;
+            color: #555;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f0f8ff 0%, #e3f2fd 100%);
+            border-left: 5px solid #0065C2;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 101, 194, 0.1);
+        }
+
+        .contact {
+            margin-top: 50px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .contact h2 {
+            margin-top: 0;
+        }
+
+        .contact a {
+            color: #0065C2;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .contact a:hover {
+            color: #004a8f;
+            text-decoration: underline;
+        }
+
+        .last-updated {
+            font-size: 0.95em;
+            color: #666;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+            padding: 25px;
+            border-left: 5px solid #ffc107;
+            border-radius: 12px;
+            margin: 30px 0;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.15);
+        }
+
+        .highlight p:last-child {
+            margin-bottom: 0;
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #0065C2 0%, #004a8f 100%);
+            padding: 25px 40px;
+            text-align: center;
+            color: white;
+            font-size: 0.95em;
+            margin-top: 0;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .footer a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .nav {
+                padding: 12px 20px;
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .app-icon {
+                width: 90px;
+                height: 90px;
+            }
+
+            h1 {
+                font-size: 2.2em;
+            }
+
+            h2 {
+                font-size: 1.6em;
+            }
+
+            .intro, .highlight, .contact {
+                padding: 20px;
+            }
+
+            .footer {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="index.html">Home</a>
+            <a href="privacy-policy.html">Privacy Policy</a>
+        </div>
+
+        <div class="content">
+            <div class="header">
+                <img src="icon.png" alt="HappyTaxes App Icon" class="app-icon">
+                <h1>HappyTaxes</h1>
+                <p class="page-title">Privacy Policy</p>
+            </div>
+
+        <h2>Data Collection</h2>
+        <p><strong>No data is collected.</strong> All information you enter (receipts, categories, amounts, images, transactions) is stored exclusively on your device.</p>
+
+        <h2>Data Storage</h2>
+        <ul>
+            <li>All transaction data is stored locally using Android's Room database</li>
+            <li>Receipt images are stored in your app's private storage directory</li>
+            <li>Backups (if created) are stored in your local device storage only</li>
+            <li>No cloud storage, no syncing, no remote servers</li>
+        </ul>
+
+        <h2>Permissions Used</h2>
+        <p><strong>Camera:</strong> Required to capture receipt photos for expense tracking</p>
+        <p><strong>Storage:</strong> Required to save receipt images and export data to CSV/PDF/ZIP formats</p>
+        <p><strong>Notifications:</strong> Used for optional reminders and tax year-end alerts that you can enable</p>
+
+        <h2>Data Sharing</h2>
+        <div class="highlight">
+            <p><strong>Your data never leaves your device. No data is transmitted to external servers.</strong></p>
+        </div>
+
+        <h2>Your Rights</h2>
+        <p>Since all data is stored locally on your device:</p>
+        <ul>
+            <li>You can delete all data by clearing the app's data in Android Settings → Apps → HappyTaxes → Storage → Clear Data</li>
+            <li>You can export your data at any time using the app's CSV/PDF/ZIP export features</li>
+            <li>You have complete control over your backups</li>
+        </ul>
+
+        <h2>Data Security</h2>
+        <ul>
+            <li>Data is stored in Android's secure app-private storage</li>
+            <li>Only your app can access this data</li>
+            <li>Receipt images are compressed to save space while maintaining quality</li>
+            <li>No internet connection is required or used for data storage</li>
+        </ul>
+
+        <h2>Changes to This Policy</h2>
+        <p>Users will be notified of any material changes to this policy through app updates. Continued use of the app after changes constitutes acceptance of the updated policy.</p>
+
+            <div class="contact">
+                <h2>Contact</h2>
+                <p>
+                    <strong>Developer:</strong> Doru Moraru
+                    <br>
+                    <strong>Source Code:</strong> <a href="https://github.com/dorumrr/happytaxes" target="_blank">https://github.com/dorumrr/happytaxes</a>
+                    <br>
+                    <strong>Issues:</strong> <a href="https://github.com/dorumrr/happytaxes/issues" target="_blank">https://github.com/dorumrr/happytaxes/issues</a>
+                    <br>
+                    <strong>Email:</strong> <a href="mailto:happytaxes@doru.uk">happytaxes@doru.uk</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><a href="/">HappyTaxes</a> • <a href="index.html">Home</a></p>
+        </div>
+    </div>
+</body>
+</html>
+

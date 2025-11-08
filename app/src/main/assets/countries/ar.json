@@ -1,0 +1,97 @@
+{
+  "country": {
+    "code": "AR",
+    "name": "Argentina",
+    "fiscalYearName": "Año Fiscal"
+  },
+  "taxPeriod": {
+    "startMonth": 1,
+    "startDay": 1,
+    "endMonth": 12,
+    "endDay": 31,
+    "description": "Argentine fiscal year runs from 1 January to 31 December"
+  },
+  "currency": {
+    "code": "ARS",
+    "symbol": "$",
+    "name": "Argentine Peso",
+    "decimalSeparator": ",",
+    "thousandSeparator": "."
+  },
+  "taxAuthority": {
+    "name": "AFIP",
+    "fullName": "Administración Federal de Ingresos Públicos",
+    "selfAssessmentForm": "N/A",
+    "formDescription": "Consult AFIP for tax requirements",
+    "website": "https://www.afip.gob.ar"
+  },
+  "categories": {
+    "income": [
+      {
+        "id": "ar_income_sales",
+        "name": "Ventas",
+        "icon": "shopping_cart",
+        "color": "#4CAF50",
+        "displayOrder": 1,
+        "description": "Income from sales"
+      },
+      {
+        "id": "ar_income_other",
+        "name": "Otros Ingresos",
+        "icon": "attach_money",
+        "color": "#4CAF50",
+        "displayOrder": 2,
+        "description": "Other income"
+      }
+    ],
+    "expense": [
+      {
+        "id": "ar_expense_cogs",
+        "name": "Costo de Bienes",
+        "icon": "inventory",
+        "color": "#F44336",
+        "displayOrder": 10,
+        "description": "Cost of goods"
+      },
+      {
+        "id": "ar_expense_travel",
+        "name": "Viajes",
+        "icon": "directions_car",
+        "color": "#F44336",
+        "displayOrder": 11,
+        "description": "Travel expenses"
+      },
+      {
+        "id": "ar_expense_office",
+        "name": "Oficina",
+        "icon": "phone",
+        "color": "#F44336",
+        "displayOrder": 12,
+        "description": "Office expenses"
+      },
+      {
+        "id": "ar_expense_professional",
+        "name": "Servicios Profesionales",
+        "icon": "gavel",
+        "color": "#F44336",
+        "displayOrder": 13,
+        "description": "Professional services"
+      },
+      {
+        "id": "ar_expense_other",
+        "name": "Otros Gastos",
+        "icon": "receipt",
+        "color": "#F44336",
+        "displayOrder": 14,
+        "description": "Other expenses"
+      }
+    ]
+  },
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2025-10-22",
+    "source": "Standard business categories",
+    "notes": "Basic categories for Argentine businesses"
+  }
+}
+

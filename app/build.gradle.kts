@@ -57,6 +57,17 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            
+            // Disable baseline profiles for reproducible builds
+            packaging {
+                resources {
+                    excludes += setOf(
+                        "**.prof",
+                        "**.profm"
+                    )
+                }
+            }
+            
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

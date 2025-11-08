@@ -1,6 +1,4 @@
 Initial release of HappyTaxes
-
-Features:
 • Track income and expenses with receipts
 • Generate Profit & Loss reports
 • Receipt capture with OCR

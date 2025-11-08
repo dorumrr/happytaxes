@@ -39,6 +39,11 @@ android {
         }
     }
 
+    // Disable baseline profiles for reproducible builds
+    androidResources {
+        ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~:baseline.prof:baseline.profm"
+    }
+
     signingConfigs {
         if (keystorePropertiesFile.exists()) {
             create("release") {
@@ -57,16 +62,6 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
-            
-            // Disable baseline profiles for reproducible builds
-            packaging {
-                resources {
-                    excludes += setOf(
-                        "**.prof",
-                        "**.profm"
-                    )
-                }
-            }
             
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -102,7 +97,13 @@ android {
 
     packaging {
         resources {
+            // Standard Android license files
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            // Reproducible builds - exclude non-deterministic files
+            excludes += "assets/dexopt/baseline.prof"
+            excludes += "assets/dexopt/baseline.profm"
+            excludes += "META-INF/version-control-info.textproto"
+            excludes += "META-INF/androidx.profileinstaller_profileinstaller.version"
         }
     }
 
@@ -117,6 +118,26 @@ android {
                 "happytaxes-v${versionName}-debug.apk"
             }
         }
+    }
+}
+
+// Remove non-deterministic files for reproducible F-Droid builds
+afterEvaluate {
+    tasks.register<Exec>("stripNonDeterministicFiles") {
+        val apkFile = layout.buildDirectory.file("outputs/apk/release/happytaxes-v1.0.0.apk")
+
+        commandLine(
+            "zip", "-d", apkFile.get().asFile.absolutePath,
+            "META-INF/version-control-info.textproto",
+            "assets/dexopt/baseline.prof",
+            "assets/dexopt/baseline.profm",
+            "META-INF/androidx.profileinstaller_profileinstaller.version"
+        )
+        isIgnoreExitValue = true // Ignore if files don't exist
+    }
+
+    tasks.named("assembleRelease") {
+        finalizedBy("stripNonDeterministicFiles")
     }
 }
 

@@ -17,6 +17,15 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+// Disable baseline profiles for reproducible builds (F-Droid compatibility)
+tasks.whenTaskAdded {
+    if (name.contains("compileReleaseArtProfile") ||
+        name.contains("mergeReleaseArtProfile") ||
+        name.contains("ArtProfile")) {
+        enabled = false
+    }
+}
+
 android {
     namespace = "io.github.dorumrr.happytaxes"
     compileSdk = 35
@@ -44,13 +53,23 @@ android {
         ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~:baseline.prof:baseline.profm"
     }
 
+    // Disable dependency metadata for reproducible builds
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
     signingConfigs {
         if (keystorePropertiesFile.exists()) {
             create("release") {
                 val storeFilePath = keystoreProperties.getProperty("storeFile")
                 if (storeFilePath != null && storeFilePath.isNotEmpty()) {
-                    // Path is relative to rootProject directory
-                    storeFile = rootProject.file(storeFilePath)
+                    // Handle both absolute and relative paths
+                    storeFile = if (File(storeFilePath).isAbsolute) {
+                        File(storeFilePath)
+                    } else {
+                        rootProject.file(storeFilePath)
+                    }
                     storePassword = keystoreProperties.getProperty("storePassword")
                     keyAlias = keystoreProperties.getProperty("keyAlias") ?: "happytaxes-release-key"
                     keyPassword = keystoreProperties.getProperty("keyPassword")
@@ -62,11 +81,14 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
-            
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            // Disable VCS info for reproducible builds (F-Droid compatibility)
+            vcsInfo.include = false
 
             // Sign with production keystore if keystore.properties exists
             signingConfig = if (keystorePropertiesFile.exists()) {
@@ -99,11 +121,11 @@ android {
         resources {
             // Standard Android license files
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
-            // Reproducible builds - exclude non-deterministic files
-            excludes += "assets/dexopt/baseline.prof"
-            excludes += "assets/dexopt/baseline.profm"
-            excludes += "META-INF/version-control-info.textproto"
+            // Additional excludes for reproducible builds
+            excludes += "/META-INF/versions/**"
+            excludes += "**/kotlin_builtins"
             excludes += "META-INF/androidx.profileinstaller_profileinstaller.version"
+            pickFirsts += listOf("META-INF/INDEX.LIST", "META-INF/io.netty.versions.properties")
         }
     }
 
@@ -118,26 +140,6 @@ android {
                 "happytaxes-v${versionName}-debug.apk"
             }
         }
-    }
-}
-
-// Remove non-deterministic files for reproducible F-Droid builds
-afterEvaluate {
-    tasks.register<Exec>("stripNonDeterministicFiles") {
-        val apkFile = layout.buildDirectory.file("outputs/apk/release/happytaxes-v1.0.0.apk")
-
-        commandLine(
-            "zip", "-d", apkFile.get().asFile.absolutePath,
-            "META-INF/version-control-info.textproto",
-            "assets/dexopt/baseline.prof",
-            "assets/dexopt/baseline.profm",
-            "META-INF/androidx.profileinstaller_profileinstaller.version"
-        )
-        isIgnoreExitValue = true // Ignore if files don't exist
-    }
-
-    tasks.named("assembleRelease") {
-        finalizedBy("stripNonDeterministicFiles")
     }
 }
 

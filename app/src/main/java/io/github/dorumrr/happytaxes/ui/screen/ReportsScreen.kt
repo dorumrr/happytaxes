@@ -3,6 +3,7 @@ package io.github.dorumrr.happytaxes.ui.screen
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
@@ -42,7 +43,8 @@ fun ReportsScreen(
     val availableCategories by viewModel.availableCategories.collectAsState()
     val decimalSeparator by viewModel.decimalSeparator.collectAsState()
     val thousandSeparator by viewModel.thousandSeparator.collectAsState()
-    val scrollState = rememberScrollState()
+    // Don't save scroll position - always start at top when navigating to Reports
+    val scrollState = remember { ScrollState(initial = 0) }
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     var showFiltersDialog by remember { mutableStateOf(false) }

@@ -1,0 +1,2 @@
+• Added dynamic color support with user preference management
+• Fixed scroll position for Reports and Settings screens

@@ -3,7 +3,7 @@
 **Proper bookkeeping. Private. Free.**
 
 <p>
-  <!--<a href="https://f-droid.org/en/packages/io.github.dorumrr.happytaxes/"><img height="50" src="https://f-droid.org/badge/get-it-on.png"></a> <a href="https://apt.izzysoft.de/packages/io.github.dorumrr.happytaxes"><img height="50" src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png"></a>--> <a href="https://www.buymeacoffee.com/ossdev"><img height="50" src="https://cdn.buymeacoffee.com/buttons/v2/arial-yellow.png" /></a>
+  <a href="https://f-droid.org/en/packages/io.github.dorumrr.happytaxes/"><img height="50" src="https://f-droid.org/badge/get-it-on.png"></a> <!--<a href="https://apt.izzysoft.de/packages/io.github.dorumrr.happytaxes"><img height="50" src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png"></a>--> <a href="https://www.buymeacoffee.com/ossdev"><img height="50" src="https://cdn.buymeacoffee.com/buttons/v2/arial-yellow.png" /></a>
 </p>
 
 > A private, offline-first cash-basis bookkeeping app with receipt OCR. Made for freelancers, sole traders, small business, even personal finance. Track your finances, prepare for tax time, and keep your data yours.

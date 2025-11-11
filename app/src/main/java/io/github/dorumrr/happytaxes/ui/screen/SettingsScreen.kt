@@ -198,6 +198,18 @@ fun SettingsScreen(
                     },
                     onClick = { showAddButtonPositionDialog = true }
                 )
+
+                SettingsSwitchItem(
+                    icon = Icons.Default.Palette,
+                    title = "Dynamic Color Support",
+                    subtitle = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                        "Use wallpaper colors (Material You)"
+                    } else {
+                        "Requires Android 12+"
+                    },
+                    checked = uiState.dynamicColorEnabled,
+                    onCheckedChange = { viewModel.setDynamicColorEnabled(it) }
+                )
             }
 
             HorizontalDivider()

@@ -88,7 +88,7 @@ class SettingsViewModel @Inject constructor(
                 GeneralSettings(country, taxPeriod.start, taxPeriod.end, baseCurrency, defaultType, addButtonPosition)
             }
 
-            // Combine next 5 flows
+            // Combine next 5 flows (notifications, reminders, OCR, retention)
             val otherSettings = combine(
                 preferencesRepository.getNotificationsEnabled(),
                 preferencesRepository.getTransactionReminderEnabled(),
@@ -99,11 +99,14 @@ class SettingsViewModel @Inject constructor(
                 OtherSettings(notificationsEnabled, reminderEnabled, reminderFrequency, ocrEnabled, retentionYears)
             }
 
+            // Get dynamic color separately (to avoid exceeding 5 flows limit)
+            val dynamicColorFlow = preferencesRepository.getDynamicColorEnabled()
+
             // Get theme separately (to avoid exceeding 5 flows limit)
             val themeFlow = preferencesRepository.getTheme()
 
-            // Combine the three groups
-            combine(generalSettings, otherSettings, themeFlow) { general, other, theme ->
+            // Combine all settings into UI state
+            combine(generalSettings, otherSettings, themeFlow, dynamicColorFlow) { general, other, theme, dynamicColor ->
                 // Parse tax period start/end to extract month and day
                 val (startMonth, startDay) = parseTaxPeriod(general.taxPeriodStart)
                 val (endMonth, endDay) = parseTaxPeriod(general.taxPeriodEnd)
@@ -124,6 +127,7 @@ class SettingsViewModel @Inject constructor(
                     transactionReminderFrequency = other.reminderFrequency,
                     ocrEnabled = other.ocrEnabled,
                     dataRetentionYears = other.retentionYears,
+                    dynamicColorEnabled = dynamicColor,
                     theme = theme,
                     appVersion = BuildConfig.VERSION_NAME,
                     isLoading = false
@@ -365,6 +369,15 @@ class SettingsViewModel @Inject constructor(
     }
 
     /**
+     * Set dynamic color enabled/disabled.
+     */
+    fun setDynamicColorEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setDynamicColorEnabled(enabled)
+        }
+    }
+
+    /**
      * Set data retention period in years.
      */
     fun setDataRetentionYears(years: Int) {
@@ -503,6 +516,7 @@ data class SettingsUiState(
     val transactionReminderFrequency: String = "daily",
     val ocrEnabled: Boolean = true,
     val dataRetentionYears: Int = 6,
+    val dynamicColorEnabled: Boolean = false, // Material You dynamic colors (Android 12+)
     val theme: String = "auto",
     val appVersion: String = "",
     val isLoading: Boolean = true,

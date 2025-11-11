@@ -52,21 +52,26 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            HappyTaxesTheme {
+            val context = LocalContext.current
+            val navController = rememberNavController()
+
+            // Get repositories from Hilt
+            val entryPoint = EntryPointAccessors.fromApplication(
+                context.applicationContext,
+                RepositoryEntryPoint::class.java
+            )
+            val preferencesRepository = entryPoint.preferencesRepository()
+            val profileRepository = entryPoint.profileRepository()
+
+            // Get dynamic color preference for theme
+            val dynamicColorEnabled by preferencesRepository.getDynamicColorEnabled()
+                .collectAsState(initial = false)
+
+            HappyTaxesTheme(dynamicColor = dynamicColorEnabled) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val context = LocalContext.current
-                    val navController = rememberNavController()
-
-                    // Get repositories from Hilt
-                    val entryPoint = EntryPointAccessors.fromApplication(
-                        context.applicationContext,
-                        RepositoryEntryPoint::class.java
-                    )
-                    val preferencesRepository = entryPoint.preferencesRepository()
-                    val profileRepository = entryPoint.profileRepository()
 
                     // Wait for DataStore to load before determining start destination
                     val startDestination by produceState<String?>(initialValue = null) {

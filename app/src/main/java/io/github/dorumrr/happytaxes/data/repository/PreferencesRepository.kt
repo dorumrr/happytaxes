@@ -68,6 +68,7 @@ class PreferencesRepository @Inject constructor(
         // Appearance (GLOBAL)
         private val THEME = stringPreferencesKey("theme") // "light", "dark", "auto"
         private val ADD_BUTTON_POSITION = stringPreferencesKey("add_button_position") // "top", "fab", or "both"
+        private val DYNAMIC_COLOR_ENABLED = booleanPreferencesKey("dynamic_color_enabled") // Material You dynamic colors (Android 12+)
 
         // ========== PROFILE-SPECIFIC PREFERENCES ==========
         // These are stored with profile ID prefix: "profile_{profileId}_preference_name"
@@ -594,6 +595,27 @@ class PreferencesRepository @Inject constructor(
     suspend fun setAddButtonPosition(position: String) {
         dataStore.edit { preferences ->
             preferences[ADD_BUTTON_POSITION] = position
+        }
+    }
+
+    /**
+     * Get dynamic color enabled preference (GLOBAL).
+     * Default: false (use brand colors)
+     * When enabled, uses Material You dynamic colors from wallpaper (Android 12+).
+     */
+    fun getDynamicColorEnabled(): Flow<Boolean> {
+        return dataStore.data.map { preferences ->
+            preferences[DYNAMIC_COLOR_ENABLED] ?: false
+        }
+    }
+
+    /**
+     * Set dynamic color enabled preference (GLOBAL).
+     * @param enabled true to use Material You colors, false for brand colors
+     */
+    suspend fun setDynamicColorEnabled(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[DYNAMIC_COLOR_ENABLED] = enabled
         }
     }
 

@@ -34,8 +34,15 @@ android {
         applicationId = "io.github.dorumrr.happytaxes"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = 3
+        versionName = "1.0.2"
+
+        // Reduce APK size by excluding x86/x86_64 ABIs (emulators and rare devices)
+        // Keeps arm64-v8a and armeabi-v7a which cover 99%+ of real Android devices
+        // Reduces APK size from ~42 MB to ~22 MB (48% reduction)
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+        }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

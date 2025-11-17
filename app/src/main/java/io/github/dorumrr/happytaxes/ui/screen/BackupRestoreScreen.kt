@@ -1,12 +1,15 @@
 package io.github.dorumrr.happytaxes.ui.screen
 
+import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.Process
 import android.provider.MediaStore
+import kotlin.system.exitProcess
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.annotation.RequiresApi
 import androidx.activity.result.contract.ActivityResultContracts
@@ -444,16 +447,29 @@ fun BackupRestoreScreen(
                 Text("Restore Complete")
             },
             text = {
-                Text("Your data has been restored successfully. The app must be restarted for changes to take effect.\n\nPlease close and reopen the app.")
+                Text("Your data has been restored successfully. The app will restart automatically to complete the restore.")
             },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        // Exit the app
-                        android.os.Process.killProcess(android.os.Process.myPid())
+                        // Restart the entire app to reopen database with restored data
+                        val activity = context as? Activity
+                        activity?.let { act ->
+                            // Create intent to restart at the root activity
+                            val intent = act.packageManager.getLaunchIntentForPackage(act.packageName)
+                            intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+
+                            // Start the app fresh
+                            act.startActivity(intent)
+
+                            // Kill the current process to ensure clean restart
+                            act.finish()
+                            Process.killProcess(Process.myPid())
+                            exitProcess(0)
+                        }
                     }
                 ) {
-                    Text("Close App")
+                    Text("Restart App")
                 }
             }
         )

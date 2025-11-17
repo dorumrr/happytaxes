@@ -250,6 +250,223 @@ enforce_strict_storage() {
     echo ""
 }
 
+# Find avdmanager command
+find_avdmanager() {
+    # Try common locations
+    local avdmanager_paths=(
+        "$HOME/Library/Android/sdk/cmdline-tools/latest/bin/avdmanager"
+        "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
+        "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager"
+    )
+
+    for path in "${avdmanager_paths[@]}"; do
+        if [ -f "$path" ]; then
+            echo "$path"
+            return 0
+        fi
+    done
+
+    # Try to find in PATH
+    if command -v avdmanager &> /dev/null; then
+        echo "avdmanager"
+        return 0
+    fi
+
+    return 1
+}
+
+# List available emulators with detailed information
+list_emulators() {
+    print_info "Finding available emulators..."
+
+    local emulator_cmd=$(find_emulator)
+    if [ -z "$emulator_cmd" ]; then
+        print_error "Could not find emulator command."
+        print_info "Please install Android SDK."
+        exit 1
+    fi
+
+    # Get list of available AVDs
+    local avds=$($emulator_cmd -list-avds)
+
+    if [ -z "$avds" ]; then
+        print_warning "No emulators (AVDs) found."
+        print_info "Create an AVD in Android Studio: Tools > Device Manager > Create Device"
+        exit 0
+    fi
+
+    # Show detailed information using avdmanager
+    local avdmanager_cmd=$(find_avdmanager)
+
+    if [ -n "$avdmanager_cmd" ]; then
+        echo ""
+        $avdmanager_cmd list avd
+        echo ""
+    else
+        print_warning "avdmanager not found. Showing simple list instead."
+        echo ""
+        print_success "Available emulators:"
+        echo ""
+
+        while IFS= read -r avd; do
+            echo "  • $avd"
+        done <<< "$avds"
+        echo ""
+    fi
+
+    # Show numbered quick reference
+    print_info "Quick reference:"
+    echo ""
+
+    local index=1
+    while IFS= read -r avd; do
+        echo "  ${index}. ${avd}"
+        index=$((index + 1))
+    done <<< "$avds"
+
+    echo ""
+    print_info "Usage: ./dev.sh emulator <name|number>"
+    echo ""
+}
+
+# Start emulator by name or number
+start_emulator_by_name_or_number() {
+    local input="$1"
+
+    if [ -z "$input" ]; then
+        print_error "Please specify emulator name or number."
+        echo ""
+        print_info "Usage: ./dev.sh emulator <name|number>"
+        print_info "Example: ./dev.sh emulator 1"
+        print_info "Example: ./dev.sh emulator Pixel_8_API_29"
+        echo ""
+        print_info "To see available emulators: ./dev.sh emulators"
+        exit 1
+    fi
+
+    local emulator_cmd=$(find_emulator)
+    if [ -z "$emulator_cmd" ]; then
+        print_error "Could not find emulator command."
+        print_info "Please install Android SDK."
+        exit 1
+    fi
+
+    # Get list of available AVDs
+    local avds=$($emulator_cmd -list-avds)
+
+    if [ -z "$avds" ]; then
+        print_error "No emulators (AVDs) found."
+        print_info "Create an AVD in Android Studio: Tools > Device Manager > Create Device"
+        exit 1
+    fi
+
+    local avd_name=""
+
+    # Check if input is a number
+    if [[ "$input" =~ ^[0-9]+$ ]]; then
+        # Get AVD by index
+        local index=1
+        while IFS= read -r avd; do
+            if [ "$index" -eq "$input" ]; then
+                avd_name="$avd"
+                break
+            fi
+            index=$((index + 1))
+        done <<< "$avds"
+
+        if [ -z "$avd_name" ]; then
+            print_error "Invalid emulator number: ${input}"
+            echo ""
+            print_info "Available emulators:"
+            local idx=1
+            while IFS= read -r avd; do
+                echo "  ${idx}. ${avd}"
+                idx=$((idx + 1))
+            done <<< "$avds"
+            exit 1
+        fi
+    else
+        # Check if AVD name exists
+        if echo "$avds" | grep -q "^${input}$"; then
+            avd_name="$input"
+        else
+            print_error "Emulator not found: ${input}"
+            echo ""
+            print_info "Available emulators:"
+            local idx=1
+            while IFS= read -r avd; do
+                echo "  ${idx}. ${avd}"
+                idx=$((idx + 1))
+            done <<< "$avds"
+            exit 1
+        fi
+    fi
+
+    print_info "Starting emulator: ${avd_name}"
+
+    # Start emulator in background
+    $emulator_cmd -avd "$avd_name" -no-snapshot-load > /dev/null 2>&1 &
+    local emulator_pid=$!
+
+    print_info "Waiting for emulator to boot (this may take 30-90 seconds)..."
+
+    # Wait for emulator to be online (max 180 seconds)
+    local timeout=180
+    local elapsed=0
+    local device_online=false
+
+    # First, wait for device to appear
+    while [ $elapsed -lt $timeout ]; do
+        local device_count=$(adb devices | grep -v "List" | grep "device$" | wc -l)
+        if [ "$device_count" -gt 0 ]; then
+            device_online=true
+            break
+        fi
+        sleep 2
+        elapsed=$((elapsed + 2))
+
+        # Show progress every 10 seconds
+        if [ $((elapsed % 10)) -eq 0 ]; then
+            print_info "Waiting for emulator to appear... (${elapsed}s elapsed)"
+        fi
+    done
+
+    if [ "$device_online" = false ]; then
+        print_error "Emulator failed to appear within ${timeout} seconds."
+        exit 1
+    fi
+
+    print_info "Emulator device online. Waiting for boot to complete..."
+
+    # Wait for boot to complete
+    adb wait-for-device
+
+    # Wait for boot animation to finish
+    elapsed=0
+    while [ $elapsed -lt $timeout ]; do
+        local boot_completed=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+        if [ "$boot_completed" = "1" ]; then
+            print_success "Emulator ready: ${avd_name}"
+            echo ""
+            print_info "You can now run:"
+            print_info "  ./dev.sh install    # Fresh install (removes all data)"
+            print_info "  ./dev.sh update     # Update install (preserves data)"
+            echo ""
+            return 0
+        fi
+        sleep 2
+        elapsed=$((elapsed + 2))
+
+        # Show progress every 10 seconds
+        if [ $((elapsed % 10)) -eq 0 ]; then
+            print_info "Waiting for boot to complete... (${elapsed}s elapsed)"
+        fi
+    done
+
+    print_error "Emulator failed to boot within ${timeout} seconds."
+    exit 1
+}
+
 # Install command (fresh install - removes all data)
 install_app() {
     print_info "Starting fresh installation..."
@@ -820,6 +1037,10 @@ show_usage() {
     echo "  ./dev.sh release                     - Build signed release APK"
     echo "  ./dev.sh aab                         - Build release AAB for Google Play Store"
     echo ""
+    echo "Emulator Management:"
+    echo "  ./dev.sh emulators                   - List all available emulators (AVDs)"
+    echo "  ./dev.sh emulator <name|number>      - Start specific emulator by name or number"
+    echo ""
     echo "Keystore Management:"
     echo "  ./dev.sh create-keystore             - Create production keystore (first time)"
     echo "  ./dev.sh populate-keystore-properties - Create keystore.properties file"
@@ -828,6 +1049,9 @@ show_usage() {
     echo "Examples:"
     echo "  ./dev.sh install              # Fresh install - removes all data"
     echo "  ./dev.sh update               # Update install - preserves transactions, receipts, settings"
+    echo "  ./dev.sh emulators            # List all available emulators"
+    echo "  ./dev.sh emulator 1           # Start first emulator from list"
+    echo "  ./dev.sh emulator Pixel_8_API_29  # Start emulator by name"
     echo "  ./dev.sh screenshot           # Take screenshot #0, #1, #2, etc."
     echo "  ./dev.sh release              # Build signed APK for F-Droid, direct distribution"
     echo "  ./dev.sh aab                  # Build AAB for Play Store"
@@ -862,6 +1086,12 @@ main() {
             ;;
         update)
             update_app
+            ;;
+        emulators)
+            list_emulators
+            ;;
+        emulator)
+            start_emulator_by_name_or_number "$2"
             ;;
         screenshot)
             take_screenshot

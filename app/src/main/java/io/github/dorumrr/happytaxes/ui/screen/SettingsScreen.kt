@@ -39,6 +39,7 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material.icons.filled.Warning
@@ -180,6 +181,14 @@ fun SettingsScreen(
                     title = "Manage Categories",
                     subtitle = "Add, edit, or delete categories",
                     onClick = onNavigateToCategoryManagement
+                )
+
+                SettingsSwitchItem(
+                    icon = Icons.Default.Receipt,
+                    title = "Allow Expenses Without Receipt",
+                    subtitle = "Save expenses without proof (not recommended for tax purposes)",
+                    checked = uiState.allowExpensesWithoutReceipt,
+                    onCheckedChange = { viewModel.setAllowExpensesWithoutReceipt(it) }
                 )
 
                 SettingsItem(

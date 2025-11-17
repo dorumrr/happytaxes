@@ -41,7 +41,8 @@ import javax.inject.Singleton
 class TransactionRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val transactionDao: TransactionDao,
-    private val profileContext: ProfileContext
+    private val profileContext: ProfileContext,
+    private val preferencesRepository: PreferencesRepository
 ) {
 
     companion object {
@@ -86,11 +87,12 @@ class TransactionRepository @Inject constructor(
                 InputValidator.validateDescription(description).onFailure { return@withTransactionLock Result.failure(it) }
                 InputValidator.validateNotes(notes).onFailure { return@withTransactionLock Result.failure(it) }
                 InputValidator.validateCategoryName(category).onFailure { return@withTransactionLock Result.failure(it) }
-                
+
                 val profileId = profileContext.getCurrentProfileIdOnce()
 
                 // Validate receipt requirement
-                val isDraft = type == TransactionType.EXPENSE && receiptPaths.isEmpty()
+                val allowWithoutReceipt = preferencesRepository.getAllowExpensesWithoutReceipt().first()
+                val isDraft = type == TransactionType.EXPENSE && receiptPaths.isEmpty() && !allowWithoutReceipt
 
             // Check for duplicates (±7 days, same amount, same category)
             // Skip duplicate check for demo data seeding to allow realistic transaction volumes
@@ -369,7 +371,8 @@ class TransactionRepository @Inject constructor(
 
             // Determine draft status
             // If isDraft parameter is provided, use it; otherwise auto-determine
-            val finalIsDraft = isDraft ?: (existing.type == TransactionType.EXPENSE && receiptPaths.isEmpty())
+            val allowWithoutReceipt = preferencesRepository.getAllowExpensesWithoutReceipt().first()
+            val finalIsDraft = isDraft ?: (existing.type == TransactionType.EXPENSE && receiptPaths.isEmpty() && !allowWithoutReceipt)
 
             val updated = existing.copy(
                 date = date,

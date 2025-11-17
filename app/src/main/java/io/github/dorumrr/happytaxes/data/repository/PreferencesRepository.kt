@@ -65,6 +65,9 @@ class PreferencesRepository @Inject constructor(
         // OCR settings (GLOBAL)
         private val OCR_ENABLED = booleanPreferencesKey("ocr_enabled")
 
+        // Receipt requirement (GLOBAL)
+        private val ALLOW_EXPENSES_WITHOUT_RECEIPT = booleanPreferencesKey("allow_expenses_without_receipt")
+
         // Appearance (GLOBAL)
         private val THEME = stringPreferencesKey("theme") // "light", "dark", "auto"
         private val ADD_BUTTON_POSITION = stringPreferencesKey("add_button_position") // "top", "fab", or "both"
@@ -637,6 +640,31 @@ class PreferencesRepository @Inject constructor(
     suspend fun setOcrEnabled(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[OCR_ENABLED] = enabled
+        }
+    }
+
+    // ========== RECEIPT REQUIREMENT (GLOBAL) ==========
+
+    /**
+     * Check if expenses can be saved without receipts (GLOBAL).
+     * Default: false (expenses without receipts are saved as drafts)
+     *
+     * This is a global preference (not profile-specific) because it's a UI/workflow
+     * preference similar to OCR settings, not a business rule.
+     */
+    fun getAllowExpensesWithoutReceipt(): Flow<Boolean> {
+        return dataStore.data.map { preferences ->
+            preferences[ALLOW_EXPENSES_WITHOUT_RECEIPT] ?: false
+        }
+    }
+
+    /**
+     * Set whether expenses can be saved without receipts (GLOBAL).
+     * @param allow true to allow expenses without receipts, false to require receipts (save as draft)
+     */
+    suspend fun setAllowExpensesWithoutReceipt(allow: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[ALLOW_EXPENSES_WITHOUT_RECEIPT] = allow
         }
     }
 

@@ -68,6 +68,13 @@ class TransactionDetailViewModel @Inject constructor(
     val uiState: StateFlow<TransactionDetailUiState> = _uiState.asStateFlow()
 
     init {
+        // Load allow expenses without receipt preference
+        viewModelScope.launch {
+            preferencesRepository.getAllowExpensesWithoutReceipt().collect { allow ->
+                _uiState.value = _uiState.value.copy(allowExpensesWithoutReceipt = allow)
+            }
+        }
+
         // Load existing transaction if editing
         transactionId?.let { id ->
             viewModelScope.launch {
@@ -787,8 +794,10 @@ class TransactionDetailViewModel @Inject constructor(
 
         // Validate receipt requirement
         if (state.type == TransactionType.EXPENSE && state.receiptPaths.isEmpty()) {
-            // This is allowed (will be saved as draft), but show warning
-            errors.add("Expense without receipt will be saved as draft")
+            if (!state.allowExpensesWithoutReceipt) {
+                // This is allowed (will be saved as draft), but show warning
+                errors.add("Expense without receipt will be saved as draft")
+            }
         }
 
         _uiState.value = state.copy(
@@ -834,6 +843,7 @@ data class TransactionDetailUiState(
     val isCompressingReceipt: Boolean = false,  // Set to true while compressing receipt
     val ocrState: OcrState = OcrState.Idle,  // OCR processing state
     val ocrRetakeRequested: Boolean = false,  // Set to true when user requests retake photo
+    val allowExpensesWithoutReceipt: Boolean = false,  // Global preference for allowing expenses without receipts
     val error: String? = null
 )
 

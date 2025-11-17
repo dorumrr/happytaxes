@@ -105,8 +105,11 @@ class SettingsViewModel @Inject constructor(
             // Get theme separately (to avoid exceeding 5 flows limit)
             val themeFlow = preferencesRepository.getTheme()
 
+            // Get allow expenses without receipt separately (to avoid exceeding 5 flows limit)
+            val allowExpensesWithoutReceiptFlow = preferencesRepository.getAllowExpensesWithoutReceipt()
+
             // Combine all settings into UI state
-            combine(generalSettings, otherSettings, themeFlow, dynamicColorFlow) { general, other, theme, dynamicColor ->
+            combine(generalSettings, otherSettings, themeFlow, dynamicColorFlow, allowExpensesWithoutReceiptFlow) { general, other, theme, dynamicColor, allowExpensesWithoutReceipt ->
                 // Parse tax period start/end to extract month and day
                 val (startMonth, startDay) = parseTaxPeriod(general.taxPeriodStart)
                 val (endMonth, endDay) = parseTaxPeriod(general.taxPeriodEnd)
@@ -127,6 +130,7 @@ class SettingsViewModel @Inject constructor(
                     transactionReminderFrequency = other.reminderFrequency,
                     ocrEnabled = other.ocrEnabled,
                     dataRetentionYears = other.retentionYears,
+                    allowExpensesWithoutReceipt = allowExpensesWithoutReceipt,
                     dynamicColorEnabled = dynamicColor,
                     theme = theme,
                     appVersion = BuildConfig.VERSION_NAME,
@@ -388,6 +392,15 @@ class SettingsViewModel @Inject constructor(
     }
 
     /**
+     * Set whether expenses can be saved without receipts (GLOBAL).
+     */
+    fun setAllowExpensesWithoutReceipt(allow: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setAllowExpensesWithoutReceipt(allow)
+        }
+    }
+
+    /**
      * Set theme preference.
      */
     fun setTheme(theme: String) {
@@ -516,6 +529,7 @@ data class SettingsUiState(
     val transactionReminderFrequency: String = "daily",
     val ocrEnabled: Boolean = true,
     val dataRetentionYears: Int = 6,
+    val allowExpensesWithoutReceipt: Boolean = false,
     val dynamicColorEnabled: Boolean = false, // Material You dynamic colors (Android 12+)
     val theme: String = "auto",
     val appVersion: String = "",

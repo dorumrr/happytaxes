@@ -257,12 +257,12 @@ fun TransactionDetailScreen(
             // Receipt/Attachment section (Phase 2)
             Card(
                 colors = CardDefaults.cardColors(
-                    containerColor = if (uiState.type == TransactionType.EXPENSE && uiState.receiptPaths.isEmpty()) {
-                        MaterialTheme.colorScheme.errorContainer
+                    containerColor = if (uiState.type == TransactionType.EXPENSE && uiState.receiptPaths.isEmpty() && !uiState.allowExpensesWithoutReceipt) {
+                        MaterialTheme.colorScheme.errorContainer  // Red - receipt required
                     } else if (uiState.receiptPaths.isNotEmpty()) {
-                        MaterialTheme.colorScheme.surfaceContainerHigh
+                        MaterialTheme.colorScheme.surfaceContainerHigh  // Elevated - has receipts
                     } else {
-                        MaterialTheme.colorScheme.surfaceVariant
+                        MaterialTheme.colorScheme.surfaceVariant  // Neutral - optional
                     }
                 ),
                 modifier = Modifier.fillMaxWidth()
@@ -277,8 +277,10 @@ fun TransactionDetailScreen(
                     ) {
                         Text(
                             text = if (uiState.type == TransactionType.EXPENSE) {
-                                if (uiState.receiptPaths.isEmpty()) "Receipt Required"
-                                else "${uiState.receiptPaths.size} Receipt(s) Attached"
+                                if (uiState.receiptPaths.isEmpty()) {
+                                    if (uiState.allowExpensesWithoutReceipt) "Receipt (Optional)"
+                                    else "Receipt Required"
+                                } else "${uiState.receiptPaths.size} Receipt(s) Attached"
                             } else {
                                 if (uiState.receiptPaths.isEmpty()) "Attachments (Optional)"
                                 else "${uiState.receiptPaths.size} Attachment(s)"
@@ -286,15 +288,22 @@ fun TransactionDetailScreen(
                             style = MaterialTheme.typography.titleSmall
                         )
                         Icon(
-                            if (uiState.type == TransactionType.EXPENSE && uiState.receiptPaths.isEmpty()) Icons.Default.Warning
-                            else Icons.Default.AttachFile,
+                            imageVector = if (uiState.type == TransactionType.EXPENSE && uiState.receiptPaths.isEmpty() && !uiState.allowExpensesWithoutReceipt) {
+                                Icons.Default.Warning
+                            } else {
+                                Icons.Default.AttachFile
+                            },
                             contentDescription = null
                         )
                     }
 
                     if (uiState.type == TransactionType.EXPENSE && uiState.receiptPaths.isEmpty()) {
                         Text(
-                            text = "Expenses must have at least one receipt. Will be saved as draft.",
+                            text = if (uiState.allowExpensesWithoutReceipt) {
+                                "Receipts are optional but recommended for tax purposes. You can require receipts in Settings by turning off Allow Expenses Without Receipt."
+                            } else {
+                                "Expenses must have a receipt. Will be saved as draft. You can disable this requirement in Settings by turning on Allow Expenses Without Receipt."
+                            },
                             style = MaterialTheme.typography.bodySmall
                         )
                     } else if (uiState.type == TransactionType.INCOME && uiState.receiptPaths.isEmpty()) {

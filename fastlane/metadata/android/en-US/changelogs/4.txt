@@ -1,0 +1,3 @@
+• Added the option to add expenses without receipt
+• Added Scoped Storage support and compliance for exports
+• Fixed the app restart after data restore

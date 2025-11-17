@@ -284,10 +284,10 @@ class ReportsViewModel @Inject constructor(
                 val result = csvExporter.exportTransactions(transactions, filename, baseCurrency)
 
                 result.fold(
-                    onSuccess = { file ->
+                    onSuccess = { filePath ->
                         _uiState.update {
                             it.copy(
-                                lastExportPath = file.absolutePath,
+                                lastExportPath = filePath,
                                 isExporting = false,
                                 exportSuccess = "CSV exported successfully"
                             )
@@ -425,19 +425,23 @@ class ReportsViewModel @Inject constructor(
                 val decimalSep = preferencesRepository.getDecimalSeparator(profileId).first()
                 val thousandSep = preferencesRepository.getThousandSeparator(profileId).first()
 
-                // Export CSV
+                // Export CSV to cache (for ZIP inclusion)
                 val csvFilename = generateFilename("csv")
-                val csvResult = csvExporter.exportTransactions(transactions, csvFilename, baseCurrency)
+                val csvResult = csvExporter.exportTransactionsToCache(transactions, csvFilename, baseCurrency)
                 val csvFile = csvResult.getOrThrow()
 
-                // Export PDF
+                // Export PDF to cache (for ZIP inclusion)
                 val pdfFilename = generateFilename("pdf")
-                val pdfResult = pdfExporter.exportReport(reportData, transactions, pdfFilename, baseCurrency, decimalSep, thousandSep)
-                val pdfPath = pdfResult.getOrThrow()
+                val pdfResult = pdfExporter.exportReportToCache(reportData, transactions, pdfFilename, baseCurrency, decimalSep, thousandSep)
+                val pdfFile = pdfResult.getOrThrow()
 
-                // Export ZIP
+                // Export ZIP to Downloads
                 val zipFilename = generateFilename("zip")
-                val zipResult = zipExporter.exportReport(csvFile.absolutePath, pdfPath, transactions, zipFilename)
+                val zipResult = zipExporter.exportReport(csvFile.absolutePath, pdfFile.absolutePath, transactions, zipFilename)
+
+                // Clean up cache files
+                csvFile.delete()
+                pdfFile.delete()
 
                 zipResult.fold(
                     onSuccess = { filePath ->

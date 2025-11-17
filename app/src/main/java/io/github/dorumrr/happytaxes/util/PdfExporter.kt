@@ -1,11 +1,16 @@
 package io.github.dorumrr.happytaxes.util
 
+import android.content.ContentValues
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
+import android.net.Uri
+import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
+import androidx.annotation.RequiresApi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.dorumrr.happytaxes.data.model.ReportData
 import io.github.dorumrr.happytaxes.domain.model.Transaction
@@ -15,6 +20,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.math.BigDecimal
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeoutException
@@ -97,12 +103,131 @@ class PdfExporter @Inject constructor(
         try {
             // Apply timeout to prevent indefinite hangs
             withTimeout(EXPORT_TIMEOUT_MS) {
-            // Get Downloads directory
-            val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            if (!downloadsDir.exists()) {
-                downloadsDir.mkdirs()
-            }
+                // Create PDF document
+                val pdfDocument = PdfDocument()
 
+                // Page 1: Summary
+                val page1 = pdfDocument.startPage(
+                    PdfDocument.PageInfo.Builder(PAGE_WIDTH, PAGE_HEIGHT, 1).create()
+                )
+                drawSummaryPage(page1.canvas, reportData, baseCurrency, decimalSeparator, thousandSeparator)
+                pdfDocument.finishPage(page1)
+
+                // Page 2: Category Breakdown
+                var pageNumber = 2
+                if (reportData.categoryBreakdown.isNotEmpty()) {
+                    val page2 = pdfDocument.startPage(
+                        PdfDocument.PageInfo.Builder(PAGE_WIDTH, PAGE_HEIGHT, pageNumber).create()
+                    )
+                    drawCategoryBreakdownPage(page2.canvas, reportData, baseCurrency, decimalSeparator, thousandSeparator, pageNumber)
+                    pdfDocument.finishPage(page2)
+                    pageNumber++
+                }
+
+                // Page 3+: Transaction Details (grouped by category)
+                if (transactions.isNotEmpty()) {
+                    pageNumber = drawTransactionDetailsPages(
+                        pdfDocument,
+                        transactions,
+                        baseCurrency,
+                        decimalSeparator,
+                        thousandSeparator,
+                        pageNumber
+                    )
+                }
+
+                // Write to Downloads (MediaStore for Android 10+, File API for Android 9-)
+                val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    exportPdfUsingMediaStore(context, filename, pdfDocument)
+                } else {
+                    exportPdfUsingFileApi(filename, pdfDocument)
+                }
+
+                pdfDocument.close()
+                result
+            }
+        } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+            Result.failure(TimeoutException("PDF export timed out after ${EXPORT_TIMEOUT_MS / 1000} seconds. Try exporting a smaller date range."))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Export PDF using MediaStore API (Android 10+).
+     * Required for Scoped Storage compliance.
+     */
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun exportPdfUsingMediaStore(
+        context: Context,
+        filename: String,
+        pdfDocument: PdfDocument
+    ): Result<String> {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+            put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+        }
+
+        val resolver = context.contentResolver
+        val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+            ?: return Result.failure(IOException("Failed to create PDF file in Downloads"))
+
+        return try {
+            resolver.openOutputStream(uri)?.use { outputStream ->
+                pdfDocument.writeTo(outputStream)
+            } ?: return Result.failure(IOException("Failed to open output stream"))
+
+            Result.success("Downloads/$filename")
+        } catch (e: Exception) {
+            // Clean up on failure
+            resolver.delete(uri, null, null)
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Export PDF using File API (Android 9 and below).
+     * Legacy approach for devices without Scoped Storage.
+     */
+    private fun exportPdfUsingFileApi(
+        filename: String,
+        pdfDocument: PdfDocument
+    ): Result<String> {
+        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        if (!downloadsDir.exists()) {
+            downloadsDir.mkdirs()
+        }
+
+        val pdfFile = File(downloadsDir, filename)
+        FileOutputStream(pdfFile).use { outputStream ->
+            pdfDocument.writeTo(outputStream)
+        }
+
+        return Result.success(pdfFile.absolutePath)
+    }
+
+    /**
+     * Export report to cache directory (for ZIP export).
+     * Used when creating ZIP files that need to read back the PDF.
+     *
+     * @param reportData Report data
+     * @param transactions List of transactions for the period (for transaction details pages)
+     * @param filename Output filename
+     * @param baseCurrency User's base currency code (e.g., "GBP", "USD", "EUR")
+     * @param decimalSeparator Decimal separator for formatting amounts
+     * @param thousandSeparator Thousand separator for formatting amounts
+     * @return Result with File object or error
+     */
+    suspend fun exportReportToCache(
+        reportData: ReportData,
+        transactions: List<Transaction>,
+        filename: String,
+        baseCurrency: String,
+        decimalSeparator: String = ".",
+        thousandSeparator: String = ","
+    ): Result<File> = withContext(Dispatchers.IO) {
+        try {
             // Create PDF document
             val pdfDocument = PdfDocument()
 
@@ -136,18 +261,15 @@ class PdfExporter @Inject constructor(
                 )
             }
 
-            // Write to file in Downloads
-            val pdfFile = File(downloadsDir, filename)
-            FileOutputStream(pdfFile).use { outputStream ->
+            // Write to cache file
+            val cacheFile = File(context.cacheDir, filename)
+            FileOutputStream(cacheFile).use { outputStream ->
                 pdfDocument.writeTo(outputStream)
             }
 
-                pdfDocument.close()
+            pdfDocument.close()
 
-                Result.success(pdfFile.absolutePath)
-            }
-        } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
-            Result.failure(TimeoutException("PDF export timed out after ${EXPORT_TIMEOUT_MS / 1000} seconds. Try exporting a smaller date range."))
+            Result.success(cacheFile)
         } catch (e: Exception) {
             Result.failure(e)
         }

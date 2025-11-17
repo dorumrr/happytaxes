@@ -1,9 +1,14 @@
 package io.github.dorumrr.happytaxes.ui.screen
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
+import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
@@ -463,29 +468,86 @@ private fun downloadReceiptToDownloads(context: Context, receiptPath: String) {
             return
         }
 
-        // Get Downloads directory
-        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        if (!downloadsDir.exists()) {
-            downloadsDir.mkdirs()
-        }
-
         // Generate filename with timestamp to avoid conflicts
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val extension = sourceFile.extension
         val filename = "HappyTaxes_Receipt_$timestamp.$extension"
 
-        val destFile = File(downloadsDir, filename)
-
-        // Copy file
-        FileInputStream(sourceFile).use { input ->
-            FileOutputStream(destFile).use { output ->
-                input.copyTo(output)
-            }
+        // Write to Downloads (MediaStore for Android 10+, File API for Android 9-)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            downloadReceiptUsingMediaStore(context, sourceFile, filename)
+        } else {
+            downloadReceiptUsingFileApi(context, sourceFile, filename)
         }
-
-        Toast.makeText(context, "Receipt saved to Downloads/$filename", Toast.LENGTH_LONG).show()
     } catch (e: Exception) {
         Toast.makeText(context, "Failed to download receipt: ${e.message}", Toast.LENGTH_SHORT).show()
     }
+}
+
+/**
+ * Download receipt using MediaStore API (Android 10+).
+ * Required for Scoped Storage compliance.
+ */
+@RequiresApi(Build.VERSION_CODES.Q)
+private fun downloadReceiptUsingMediaStore(
+    context: Context,
+    sourceFile: File,
+    filename: String
+) {
+    val mimeType = when (sourceFile.extension.lowercase()) {
+        "jpg", "jpeg" -> "image/jpeg"
+        "png" -> "image/png"
+        else -> "image/*"
+    }
+
+    val contentValues = ContentValues().apply {
+        put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+        put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
+        put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+    }
+
+    val resolver = context.contentResolver
+    val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+
+    if (uri != null) {
+        try {
+            resolver.openOutputStream(uri)?.use { outputStream ->
+                FileInputStream(sourceFile).use { inputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
+            Toast.makeText(context, "Receipt saved to Downloads/$filename", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            resolver.delete(uri, null, null)
+            Toast.makeText(context, "Failed to save receipt: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    } else {
+        Toast.makeText(context, "Failed to create file in Downloads", Toast.LENGTH_SHORT).show()
+    }
+}
+
+/**
+ * Download receipt using File API (Android 9 and below).
+ * Legacy approach for devices without Scoped Storage.
+ */
+private fun downloadReceiptUsingFileApi(
+    context: Context,
+    sourceFile: File,
+    filename: String
+) {
+    val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+    if (!downloadsDir.exists()) {
+        downloadsDir.mkdirs()
+    }
+
+    val destFile = File(downloadsDir, filename)
+
+    FileInputStream(sourceFile).use { input ->
+        FileOutputStream(destFile).use { output ->
+            input.copyTo(output)
+        }
+    }
+
+    Toast.makeText(context, "Receipt saved to Downloads/$filename", Toast.LENGTH_LONG).show()
 }
 

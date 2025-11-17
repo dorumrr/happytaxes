@@ -28,12 +28,12 @@ tasks.whenTaskAdded {
 
 android {
     namespace = "io.github.dorumrr.happytaxes"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "io.github.dorumrr.happytaxes"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 3
         versionName = "1.0.2"
 

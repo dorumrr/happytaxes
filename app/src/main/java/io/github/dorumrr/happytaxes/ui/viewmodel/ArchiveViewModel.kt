@@ -142,9 +142,9 @@ class ArchiveViewModel @Inject constructor(
                 val profileId = profileContext.getCurrentProfileIdOnce()
                 val baseCurrency = preferencesRepository.getBaseCurrency(profileId).first()
 
-                // Export to CSV first
+                // Export to CSV in cache first (for ZIP inclusion)
                 val timestamp = System.currentTimeMillis()
-                val csvResult = csvExporter.exportTransactions(
+                val csvResult = csvExporter.exportTransactionsToCache(
                     transactions,
                     "archive_$timestamp.csv",
                     baseCurrency

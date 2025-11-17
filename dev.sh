@@ -193,6 +193,63 @@ check_device() {
     print_success "Device connected: ${device_name}"
 }
 
+# Enforce strict storage permissions (for realistic testing)
+# This makes emulators behave more like real devices
+enforce_strict_storage() {
+    local android_version=$(adb shell getprop ro.build.version.sdk 2>/dev/null | tr -d '\r')
+
+    if [ -z "$android_version" ]; then
+        print_warning "Could not detect Android version"
+        return
+    fi
+
+    print_info "Configuring strict testing environment (Android API ${android_version})..."
+
+    # 1. Enforce strict Scoped Storage (Android 10+)
+    if [ "$android_version" -ge 29 ]; then
+        print_info "Enabling strict Scoped Storage enforcement..."
+        adb shell sm set-isolated-storage on 2>/dev/null || true
+
+        # Give it a moment to apply
+        sleep 1
+
+        # Verify
+        local isolated_storage=$(adb shell sm get-isolated-storage 2>/dev/null | tr -d '\r')
+        if [ "$isolated_storage" = "true" ]; then
+            print_success "✓ Strict Scoped Storage enabled"
+        else
+            print_warning "⚠ Could not verify Scoped Storage enforcement (may not be supported on this device)"
+        fi
+    else
+        print_info "Android API ${android_version} - Scoped Storage not applicable (pre-Android 10)"
+    fi
+
+    # 2. Check SELinux enforcement
+    local selinux_mode=$(adb shell getenforce 2>/dev/null | tr -d '\r')
+    if [ "$selinux_mode" = "Enforcing" ]; then
+        print_success "✓ SELinux is Enforcing (strict security)"
+    elif [ "$selinux_mode" = "Permissive" ]; then
+        print_warning "⚠ SELinux is Permissive (less strict than real devices)"
+    else
+        print_info "SELinux status: ${selinux_mode}"
+    fi
+
+    # 3. Check if this is an emulator or real device
+    local device_type=$(adb shell getprop ro.product.model 2>/dev/null | tr -d '\r')
+    local is_emulator=$(adb shell getprop ro.kernel.qemu 2>/dev/null | tr -d '\r')
+
+    if [ "$is_emulator" = "1" ]; then
+        print_info "Device type: Emulator (${device_type})"
+        print_warning "Note: Emulators may still be more permissive than real devices"
+        print_info "For best results, test on a real Android 10+ device before release"
+    else
+        print_info "Device type: Real device (${device_type})"
+        print_success "Testing on real device - most reliable results"
+    fi
+
+    echo ""
+}
+
 # Install command (fresh install - removes all data)
 install_app() {
     print_info "Starting fresh installation..."
@@ -226,6 +283,10 @@ install_app() {
     print_success "App launched"
 
     echo ""
+
+    # Enforce strict storage for realistic testing
+    enforce_strict_storage
+
     print_success "Fresh installation complete! App is running on device."
     print_warning "Note: All previous data has been removed. Use './dev.sh update' to preserve data."
 }
@@ -270,6 +331,10 @@ update_app() {
     print_success "App launched"
 
     echo ""
+
+    # Enforce strict storage for realistic testing
+    enforce_strict_storage
+
     if [ "$app_installed" = true ]; then
         print_success "Update complete! App is running with preserved data."
         print_info "Database migrations will run automatically if needed."

@@ -1,8 +1,14 @@
 package io.github.dorumrr.happytaxes.ui.screen
 
+import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.annotation.RequiresApi
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.WindowInsets
@@ -242,14 +248,13 @@ fun BackupRestoreScreen(
                             onClick = {
                                 viewModel.createBackup { backupFile ->
                                     backupFile?.let { file ->
-                                        // Copy to Downloads folder
-                                        val downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(
-                                            android.os.Environment.DIRECTORY_DOWNLOADS
-                                        )
-                                        val destFile = java.io.File(downloadsDir, file.name)
-
                                         try {
-                                            file.copyTo(destFile, overwrite = true)
+                                            // Copy to Downloads (MediaStore for Android 10+, File API for Android 9-)
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                                copyBackupUsingMediaStore(context, file)
+                                            } else {
+                                                copyBackupUsingFileApi(file)
+                                            }
                                             // Show success message
                                             successMessageText = "Data has been downloaded to your Downloads folder on your device"
                                             showSuccessMessage = true
@@ -472,4 +477,42 @@ private fun BackupRestoreSection(
         )
         content()
     }
+}
+
+/**
+ * Copy backup to Downloads using MediaStore API (Android 10+).
+ * Required for Scoped Storage compliance.
+ */
+@RequiresApi(Build.VERSION_CODES.Q)
+private fun copyBackupUsingMediaStore(context: Context, sourceFile: java.io.File) {
+    val contentValues = ContentValues().apply {
+        put(MediaStore.MediaColumns.DISPLAY_NAME, sourceFile.name)
+        put(MediaStore.MediaColumns.MIME_TYPE, "application/zip")
+        put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+    }
+
+    val resolver = context.contentResolver
+    val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+
+    if (uri != null) {
+        resolver.openOutputStream(uri)?.use { outputStream ->
+            java.io.FileInputStream(sourceFile).use { inputStream ->
+                inputStream.copyTo(outputStream)
+            }
+        }
+    } else {
+        throw java.io.IOException("Failed to create backup file in Downloads")
+    }
+}
+
+/**
+ * Copy backup to Downloads using File API (Android 9 and below).
+ * Legacy approach for devices without Scoped Storage.
+ */
+private fun copyBackupUsingFileApi(sourceFile: java.io.File) {
+    val downloadsDir = Environment.getExternalStoragePublicDirectory(
+        Environment.DIRECTORY_DOWNLOADS
+    )
+    val destFile = java.io.File(downloadsDir, sourceFile.name)
+    sourceFile.copyTo(destFile, overwrite = true)
 }

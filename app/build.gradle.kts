@@ -187,6 +187,8 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
 
     // JSON serialization (for Room converters and data parsing)
     implementation(libs.kotlinx.serialization.json)

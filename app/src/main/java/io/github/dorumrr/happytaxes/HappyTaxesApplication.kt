@@ -2,6 +2,8 @@ package io.github.dorumrr.happytaxes
 
 import android.app.Application
 import android.util.Log
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
 import io.github.dorumrr.happytaxes.data.initializer.DatabaseInitializer
 import io.github.dorumrr.happytaxes.data.notification.DataRetentionWorker
@@ -23,12 +25,16 @@ import javax.inject.Inject
  * - Initialize database with default data on first launch
  * - Initialize notification channels
  * - Schedule background workers (notifications, data retention)
+ * - Configure WorkManager with Hilt's custom WorkerFactory
  */
 @HiltAndroidApp
-class HappyTaxesApplication : Application() {
+class HappyTaxesApplication : Application(), Configuration.Provider {
 
     @Inject
     lateinit var databaseInitializer: DatabaseInitializer
+
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -61,5 +67,10 @@ class HappyTaxesApplication : Application() {
         // Schedule DataRetentionWorker for weekly retention checks (Phase 6)
         DataRetentionWorker.schedule(this)
     }
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 }
 

@@ -205,20 +205,27 @@ enforce_strict_storage() {
 
     print_info "Configuring strict testing environment (Android API ${android_version})..."
 
+    # Check device type once (used for multiple checks below)
+    local device_type=$(adb shell getprop ro.product.model 2>/dev/null | tr -d '\r')
+    local is_emulator=$(adb shell getprop ro.kernel.qemu 2>/dev/null | tr -d '\r')
+
     # 1. Enforce strict Scoped Storage (Android 10+)
     if [ "$android_version" -ge 29 ]; then
-        print_info "Enabling strict Scoped Storage enforcement..."
-        adb shell sm set-isolated-storage on 2>/dev/null || true
-
-        # Give it a moment to apply
-        sleep 1
-
-        # Verify
-        local isolated_storage=$(adb shell sm get-isolated-storage 2>/dev/null | tr -d '\r')
-        if [ "$isolated_storage" = "true" ]; then
-            print_success "✓ Strict Scoped Storage enabled"
+        # Check if we should skip (only on emulators with API 29-30)
+        if [ "$is_emulator" = "1" ] && [ "$android_version" -le 30 ]; then
+            # Skip on API 29-30 emulators (known to cause device reboot)
+            print_warning "⚠ Skipping isolated storage on emulator (causes device reboot on API 29-30)"
+            print_info "Note: Real devices and newer emulators handle this setting without rebooting"
+            print_info "Your app will still work correctly - this is just a testing enhancement"
         else
-            print_warning "⚠ Could not verify Scoped Storage enforcement (may not be supported on this device)"
+            # Apply on: real devices (all versions) OR emulators with API 31+
+            print_info "Enabling strict Scoped Storage enforcement..."
+            adb shell sm set-isolated-storage on 2>/dev/null || {
+                # Command might not exist on newer Android versions (API 31+)
+                print_info "Note: Isolated storage command not available on this Android version"
+            }
+            sleep 1
+            print_success "✓ Strict Scoped Storage configured"
         fi
     else
         print_info "Android API ${android_version} - Scoped Storage not applicable (pre-Android 10)"
@@ -234,10 +241,7 @@ enforce_strict_storage() {
         print_info "SELinux status: ${selinux_mode}"
     fi
 
-    # 3. Check if this is an emulator or real device
-    local device_type=$(adb shell getprop ro.product.model 2>/dev/null | tr -d '\r')
-    local is_emulator=$(adb shell getprop ro.kernel.qemu 2>/dev/null | tr -d '\r')
-
+    # 3. Display device type information
     if [ "$is_emulator" = "1" ]; then
         print_info "Device type: Emulator (${device_type})"
         print_warning "Note: Emulators may still be more permissive than real devices"

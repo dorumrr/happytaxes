@@ -611,10 +611,9 @@ private fun validateCapturedImage(file: File): Result<Unit> {
         }
         
         // Check for extremely large dimensions that could cause OOM
-        // Most phone cameras are 12-48MP, so 100MP is a safe upper limit
-        val maxPixels = 100L * 1024 * 1024 // 100 megapixels
+        val maxPixels = 250L * 1024 * 1024 // up to 250 megapixels phone cameras
         val totalPixels = width.toLong() * height.toLong()
-        
+
         if (totalPixels > maxPixels) {
             return Result.failure(
                 Exception("Image resolution too high (${width}x${height}). Please try again.")

@@ -73,6 +73,10 @@ class PreferencesRepository @Inject constructor(
         private val ADD_BUTTON_POSITION = stringPreferencesKey("add_button_position") // "top", "fab", or "both"
         private val DYNAMIC_COLOR_ENABLED = booleanPreferencesKey("dynamic_color_enabled") // Material You dynamic colors (Android 12+)
 
+        // Security (GLOBAL)
+        private val BIOMETRIC_AUTH_ENABLED = booleanPreferencesKey("biometric_auth_enabled") // Biometric authentication on app launch
+        private val AUTO_LOCK_TIMEOUT = intPreferencesKey("auto_lock_timeout") // Auto-lock timeout in seconds (0=immediate, 60=1min, 300=5min, 600=10min)
+
         // ========== PROFILE-SPECIFIC PREFERENCES ==========
         // These are stored with profile ID prefix: "profile_{profileId}_preference_name"
 
@@ -736,6 +740,49 @@ class PreferencesRepository @Inject constructor(
     suspend fun setTheme(theme: String) {
         dataStore.edit { preferences ->
             preferences[THEME] = theme
+        }
+    }
+
+    // ========== SECURITY ==========
+
+    /**
+     * Check if biometric authentication is enabled (GLOBAL).
+     * Default: false (user must opt-in)
+     */
+    fun getBiometricAuthEnabled(): Flow<Boolean> {
+        return dataStore.data.map { preferences ->
+            preferences[BIOMETRIC_AUTH_ENABLED] ?: false
+        }
+    }
+
+    /**
+     * Set biometric authentication enabled/disabled (GLOBAL).
+     * @param enabled true to require biometric auth on app launch, false to disable
+     */
+    suspend fun setBiometricAuthEnabled(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[BIOMETRIC_AUTH_ENABLED] = enabled
+        }
+    }
+
+    /**
+     * Get auto-lock timeout in seconds (GLOBAL).
+     * Default: 60 seconds (1 minute)
+     * Options: 0 (immediate), 60 (1 min), 300 (5 min), 600 (10 min)
+     */
+    fun getAutoLockTimeout(): Flow<Int> {
+        return dataStore.data.map { preferences ->
+            preferences[AUTO_LOCK_TIMEOUT] ?: 60 // Default: 1 minute
+        }
+    }
+
+    /**
+     * Set auto-lock timeout in seconds (GLOBAL).
+     * @param timeoutSeconds timeout in seconds (0=immediate, 60=1min, 300=5min, 600=10min)
+     */
+    suspend fun setAutoLockTimeout(timeoutSeconds: Int) {
+        dataStore.edit { preferences ->
+            preferences[AUTO_LOCK_TIMEOUT] = timeoutSeconds
         }
     }
 

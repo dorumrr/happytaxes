@@ -182,6 +182,9 @@ dependencies {
     // SQLite (standard, no encryption)
     implementation(libs.androidx.sqlite)
 
+    // Biometric Authentication
+    implementation(libs.androidx.biometric)
+
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

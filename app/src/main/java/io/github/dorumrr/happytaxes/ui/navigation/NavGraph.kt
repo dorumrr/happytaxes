@@ -220,6 +220,9 @@ fun NavGraph(
                 },
                 onNavigateToCategoryManagement = {
                     navController.navigate(Screen.CategoryManagement.route)
+                },
+                onNavigateToAccessPin = {
+                    navController.navigate(Screen.AccessPin.route)
                 }
             )
         }
@@ -227,6 +230,15 @@ fun NavGraph(
         // Category Management screen
         composable(Screen.CategoryManagement.route) {
             CategoryManagementScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // Access PIN screen
+        composable(Screen.AccessPin.route) {
+            io.github.dorumrr.happytaxes.ui.screen.AccessPinScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }
@@ -392,6 +404,8 @@ sealed class Screen(val route: String) {
     object Settings : Screen("settings")
 
     object CategoryManagement : Screen("category_management")
+
+    object AccessPin : Screen("access_pin")
 
     object Reports : Screen("reports")
 

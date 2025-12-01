@@ -24,6 +24,7 @@ paging = "3.3.5"
 androidx-sqlite = "2.4.0"
 sqlcipher = "4.5.4"
 security-crypto = "1.1.0-alpha06"
+biometric = "1.1.0"
 
 # Dependency Injection
 hilt = "2.57.1"
@@ -89,6 +90,7 @@ androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", 
 androidx-sqlite = { group = "androidx.sqlite", name = "sqlite", version.ref = "androidx-sqlite" }
 sqlcipher-android = { group = "net.zetetic", name = "android-database-sqlcipher", version.ref = "sqlcipher" }
 androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "security-crypto" }
+androidx-biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
 
 # Hilt
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }

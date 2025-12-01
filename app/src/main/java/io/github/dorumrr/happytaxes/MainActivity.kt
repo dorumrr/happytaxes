@@ -1,9 +1,9 @@
 package io.github.dorumrr.happytaxes
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.fragment.app.FragmentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,6 +19,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +29,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -37,7 +41,9 @@ import io.github.dorumrr.happytaxes.di.RepositoryEntryPoint
 import io.github.dorumrr.happytaxes.ui.navigation.NavGraph
 import io.github.dorumrr.happytaxes.ui.navigation.Screen
 import io.github.dorumrr.happytaxes.ui.theme.HappyTaxesTheme
+import io.github.dorumrr.happytaxes.util.BiometricAuthManager
 import kotlinx.coroutines.flow.first
+import javax.inject.Inject
 
 /**
  * Main activity for HappyTaxes.
@@ -47,7 +53,11 @@ import kotlinx.coroutines.flow.first
  * Includes Material 3 bottom navigation bar for main screens.
  */
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
+
+    @Inject
+    lateinit var biometricAuthManager: BiometricAuthManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -67,14 +77,103 @@ class MainActivity : ComponentActivity() {
             val dynamicColorEnabled by preferencesRepository.getDynamicColorEnabled()
                 .collectAsState(initial = false)
 
+            // Get biometric auth preference
+            val biometricAuthEnabled by preferencesRepository.getBiometricAuthEnabled()
+                .collectAsState(initial = false)
+
+            // Get auto-lock timeout preference
+            val autoLockTimeout by preferencesRepository.getAutoLockTimeout()
+                .collectAsState(initial = 60)
+
+            // Track authentication state
+            var isAuthenticated by remember { mutableStateOf(false) }
+            var authenticationAttempted by remember { mutableStateOf(false) }
+            var backgroundTimestamp by remember { mutableStateOf<Long?>(null) }
+
+            // Function to show authentication prompt
+            val showAuthenticationPrompt = {
+                authenticationAttempted = true
+                android.util.Log.d("MainActivity", "Showing biometric authentication prompt")
+                biometricAuthManager.authenticate(
+                    activity = this@MainActivity,
+                    title = "Unlock HappyTaxes",
+                    subtitle = "Authenticate to access your data",
+                    description = null,
+                    onSuccess = {
+                        android.util.Log.d("MainActivity", "Authentication successful")
+                        isAuthenticated = true
+                        backgroundTimestamp = null
+                    },
+                    onError = { error ->
+                        android.util.Log.e("MainActivity", "Authentication error: $error")
+                        // Keep showing prompt until authenticated
+                        authenticationAttempted = false
+                    },
+                    onCancel = {
+                        android.util.Log.d("MainActivity", "Authentication cancelled - exiting app")
+                        // User cancelled - exit app
+                        finish()
+                    }
+                )
+            }
+
+            // Show biometric prompt on launch if enabled
+            LaunchedEffect(biometricAuthEnabled) {
+                android.util.Log.d("MainActivity", "LaunchedEffect: biometricAuthEnabled=$biometricAuthEnabled, authenticationAttempted=$authenticationAttempted")
+                if (biometricAuthEnabled && !authenticationAttempted) {
+                    showAuthenticationPrompt()
+                } else if (!biometricAuthEnabled) {
+                    android.util.Log.d("MainActivity", "Biometric auth not enabled - allowing access")
+                    // Auth not required, allow access
+                    isAuthenticated = true
+                }
+            }
+
+            // Handle lifecycle events for auto-lock
+            DisposableEffect(Unit) {
+                val lifecycleObserver = object : DefaultLifecycleObserver {
+                    override fun onStop(owner: LifecycleOwner) {
+                        // App going to background
+                        if (biometricAuthEnabled && isAuthenticated) {
+                            backgroundTimestamp = System.currentTimeMillis()
+                            android.util.Log.d("MainActivity", "App going to background at $backgroundTimestamp")
+                        }
+                    }
+
+                    override fun onStart(owner: LifecycleOwner) {
+                        // App coming to foreground
+                        if (biometricAuthEnabled && isAuthenticated && backgroundTimestamp != null) {
+                            val elapsedSeconds = (System.currentTimeMillis() - backgroundTimestamp!!) / 1000
+                            android.util.Log.d("MainActivity", "App coming to foreground. Elapsed: ${elapsedSeconds}s, Timeout: ${autoLockTimeout}s")
+
+                            if (elapsedSeconds >= autoLockTimeout) {
+                                android.util.Log.d("MainActivity", "Auto-lock timeout exceeded - requiring authentication")
+                                isAuthenticated = false
+                                authenticationAttempted = false
+                                showAuthenticationPrompt()
+                            } else {
+                                android.util.Log.d("MainActivity", "Within timeout - no authentication required")
+                            }
+                        }
+                    }
+                }
+
+                lifecycle.addObserver(lifecycleObserver)
+
+                onDispose {
+                    lifecycle.removeObserver(lifecycleObserver)
+                }
+            }
+
             HappyTaxesTheme(dynamicColor = dynamicColorEnabled) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
-                    // Wait for DataStore to load before determining start destination
-                    val startDestination by produceState<String?>(initialValue = null) {
+                    // Only show app content when authenticated (or auth not required)
+                    if (isAuthenticated) {
+                        // Wait for DataStore to load before determining start destination
+                        val startDestination by produceState<String?>(initialValue = null) {
                         val onboardingComplete = preferencesRepository.isOnboardingComplete().first()
 
                         value = when {
@@ -172,6 +271,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         }
+                    }
                     }
                 }
             }

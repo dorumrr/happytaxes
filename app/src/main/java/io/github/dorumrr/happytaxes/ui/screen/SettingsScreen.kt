@@ -36,6 +36,7 @@ import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
@@ -85,6 +86,7 @@ fun SettingsScreen(
     onNavigateToOnboarding: () -> Unit,
     onNavigateToBackupRestore: () -> Unit,
     onNavigateToCategoryManagement: () -> Unit,
+    onNavigateToAccessPin: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -181,6 +183,13 @@ fun SettingsScreen(
                     title = "Manage Categories",
                     subtitle = "Add, edit, or delete categories",
                     onClick = onNavigateToCategoryManagement
+                )
+
+                SettingsItem(
+                    icon = Icons.Default.Lock,
+                    title = "Access Security",
+                    subtitle = "Biometric authentication",
+                    onClick = onNavigateToAccessPin
                 )
 
                 SettingsSwitchItem(

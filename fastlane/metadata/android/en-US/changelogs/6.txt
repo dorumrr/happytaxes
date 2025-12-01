@@ -1,0 +1,5 @@
+- Implemented biometric authentication. Activate in Settings
+- Fixed a bug in which editing a transaction would move it out to main profile.
+- Enhanced duplicate transaction handling with confirmation dialog
+- Added duplicate transaction capability
+- Added support for image resolutions up to 250 megapixels

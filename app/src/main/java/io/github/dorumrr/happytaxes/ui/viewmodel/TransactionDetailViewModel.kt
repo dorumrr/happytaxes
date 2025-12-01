@@ -543,7 +543,7 @@ class TransactionDetailViewModel @Inject constructor(
         )
     }
 
-    fun saveTransaction() {
+    fun saveTransaction(skipDuplicateCheck: Boolean = false) {
         val state = _uiState.value
 
         if (!state.isValid) {
@@ -563,7 +563,8 @@ class TransactionDetailViewModel @Inject constructor(
                     description = state.description.ifBlank { null },
                     notes = state.notes.ifBlank { null },
                     amount = state.amount,
-                    receiptPaths = state.receiptPaths
+                    receiptPaths = state.receiptPaths,
+                    skipDuplicateCheck = skipDuplicateCheck
                 )
             } else {
                 // Create new transaction with tempTransactionId
@@ -576,10 +577,11 @@ class TransactionDetailViewModel @Inject constructor(
                     description = state.description.ifBlank { null },
                     notes = state.notes.ifBlank { null },
                     amount = state.amount,
-                    receiptPaths = state.receiptPaths
+                    receiptPaths = state.receiptPaths,
+                    skipDuplicateCheck = skipDuplicateCheck
                 )
             }
-            
+
             result.onSuccess {
                 // Delete removed receipts after successful save
                 state.removedReceiptPaths.forEach { path ->
@@ -591,16 +593,49 @@ class TransactionDetailViewModel @Inject constructor(
                     isSaved = true
                 )
             }.onFailure { error ->
-                _uiState.value = state.copy(
-                    isSaving = false,
-                    error = error.message ?: "Failed to save transaction"
-                )
+                // Check if this is a duplicate transaction error
+                if (error is io.github.dorumrr.happytaxes.data.repository.DuplicateTransactionException) {
+                    _uiState.value = state.copy(
+                        isSaving = false,
+                        showDuplicateDialog = true,
+                        duplicateDetected = error.duplicate,
+                        error = error.message
+                    )
+                } else {
+                    _uiState.value = state.copy(
+                        isSaving = false,
+                        error = error.message ?: "Failed to save transaction"
+                    )
+                }
             }
         }
     }
     
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
+    }
+
+    /**
+     * Dismiss duplicate confirmation dialog without saving.
+     */
+    fun dismissDuplicateDialog() {
+        _uiState.value = _uiState.value.copy(
+            showDuplicateDialog = false,
+            duplicateDetected = null,
+            error = null
+        )
+    }
+
+    /**
+     * Confirm saving duplicate transaction.
+     * Retries save with skipDuplicateCheck = true.
+     */
+    fun confirmSaveDuplicate() {
+        _uiState.value = _uiState.value.copy(
+            showDuplicateDialog = false,
+            duplicateDetected = null
+        )
+        saveTransaction(skipDuplicateCheck = true)
     }
 
     /**
@@ -844,7 +879,9 @@ data class TransactionDetailUiState(
     val ocrState: OcrState = OcrState.Idle,  // OCR processing state
     val ocrRetakeRequested: Boolean = false,  // Set to true when user requests retake photo
     val allowExpensesWithoutReceipt: Boolean = false,  // Global preference for allowing expenses without receipts
-    val error: String? = null
+    val error: String? = null,
+    val duplicateDetected: Transaction? = null,  // Stores the duplicate transaction found
+    val showDuplicateDialog: Boolean = false  // Controls duplicate confirmation dialog visibility
 )
 
 /**

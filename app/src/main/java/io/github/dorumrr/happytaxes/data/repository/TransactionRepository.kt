@@ -99,9 +99,11 @@ class TransactionRepository @Inject constructor(
             if (!skipDuplicateCheck) {
                 val duplicate = checkForDuplicate(date, amount, category, "")
                 if (duplicate != null) {
+                    val duplicateDesc = duplicate.description?.takeIf { it.isNotBlank() } ?: "transaction"
                     return@withTransactionLock Result.failure(
                         DuplicateTransactionException(
-                            "Potential duplicate found: ${duplicate.description} on ${duplicate.date}"
+                            "Similar transaction found: \"$duplicateDesc\" on ${duplicate.date}",
+                            duplicate
                         )
                     )
                 }
@@ -291,7 +293,7 @@ class TransactionRepository @Inject constructor(
     
     /**
      * Update an existing transaction.
-     * 
+     *
      * Business rules:
      * - Tracks changes in edit history (from/to values)
      * - Updates timestamp
@@ -306,7 +308,8 @@ class TransactionRepository @Inject constructor(
         notes: String?,
         amount: java.math.BigDecimal,
         receiptPaths: List<String> = emptyList(),
-        isDraft: Boolean? = null  // null = don't change, true/false = set value
+        isDraft: Boolean? = null,  // null = don't change, true/false = set value
+        skipDuplicateCheck: Boolean = false
     ): Result<Transaction> {
         return ConcurrencyHelper.withTransactionLock {
             try {
@@ -347,13 +350,15 @@ class TransactionRepository @Inject constructor(
             }
 
             // Check for duplicates if amount/date/category changed
-            if (existing.date != date || existing.amount != amount ||
-                existing.category != category) {
+            if (!skipDuplicateCheck && (existing.date != date || existing.amount != amount ||
+                existing.category != category)) {
                 val duplicate = checkForDuplicate(date, amount, category, id)
                 if (duplicate != null) {
+                    val duplicateDesc = duplicate.description?.takeIf { it.isNotBlank() } ?: "transaction"
                     return@withTransactionLock Result.failure(
                         DuplicateTransactionException(
-                            "Potential duplicate: ${duplicate.description} on ${duplicate.date}"
+                            "Similar transaction found: \"$duplicateDesc\" on ${duplicate.date}",
+                            duplicate
                         )
                     )
                 }
@@ -570,5 +575,11 @@ class TransactionRepository @Inject constructor(
 
 /**
  * Exception thrown when a duplicate transaction is detected.
+ *
+ * @param message Human-readable error message
+ * @param duplicate The duplicate transaction that was found
  */
-class DuplicateTransactionException(message: String) : Exception(message)
+class DuplicateTransactionException(
+    message: String,
+    val duplicate: Transaction
+) : Exception(message)

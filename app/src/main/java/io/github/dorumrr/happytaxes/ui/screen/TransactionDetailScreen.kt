@@ -19,6 +19,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import io.github.dorumrr.happytaxes.ui.theme.Spacing
@@ -27,6 +28,7 @@ import io.github.dorumrr.happytaxes.ui.theme.Alpha
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import io.github.dorumrr.happytaxes.domain.model.Category
+import io.github.dorumrr.happytaxes.domain.model.Transaction
 import io.github.dorumrr.happytaxes.domain.model.TransactionType
 import io.github.dorumrr.happytaxes.ui.component.ReceiptThumbnailList
 import io.github.dorumrr.happytaxes.ui.util.rememberDebouncedNavigation
@@ -677,6 +679,20 @@ fun TransactionDetailScreen(
         )
     }
 
+    // Duplicate confirmation dialog
+    if (uiState.showDuplicateDialog) {
+        DuplicateConfirmationDialog(
+            duplicateTransaction = uiState.duplicateDetected,
+            duplicateMessage = uiState.error ?: "A similar transaction already exists",
+            onConfirm = {
+                viewModel.confirmSaveDuplicate()
+            },
+            onDismiss = {
+                viewModel.dismissDuplicateDialog()
+            }
+        )
+    }
+
     // OCR loading indicator
     if (uiState.ocrState is OcrState.Processing) {
         Box(
@@ -939,6 +955,108 @@ private fun RemoveReceiptDialog(
                 )
             ) {
                 Text("Remove")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+/**
+ * Duplicate transaction confirmation dialog.
+ *
+ * Shows when a potential duplicate transaction is detected and asks user to confirm
+ * whether they want to add it anyway.
+ */
+@Composable
+private fun DuplicateConfirmationDialog(
+    duplicateTransaction: Transaction?,
+    duplicateMessage: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = {
+            Icon(
+                Icons.Default.Warning,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.tertiary
+            )
+        },
+        title = {
+            Text("Possible Duplicate")
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+                Text(
+                    text = duplicateMessage,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                // Show duplicate transaction details if available
+                duplicateTransaction?.let { duplicate ->
+                    Spacer(modifier = Modifier.height(Spacing.medium))
+
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(Spacing.medium),
+                            verticalArrangement = Arrangement.spacedBy(Spacing.extraSmall)
+                        ) {
+                            Text(
+                                text = "Existing transaction:",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+
+                            Text(
+                                text = duplicate.description?.takeIf { it.isNotBlank() } ?: "(No description)",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium
+                            )
+
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(Spacing.medium)
+                            ) {
+                                Text(
+                                    text = duplicate.date.toString(),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = "•",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = duplicate.amount.toString(),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(Spacing.small))
+                Text(
+                    text = "Do you want to add this transaction anyway?",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("Add Anyway")
             }
         },
         dismissButton = {

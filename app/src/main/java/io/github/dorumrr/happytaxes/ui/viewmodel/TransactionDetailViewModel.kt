@@ -50,6 +50,9 @@ class TransactionDetailViewModel @Inject constructor(
 
     private val transactionId: String? = savedStateHandle["transactionId"]
 
+    // Get duplicate from ID from navigation arguments (null if not duplicating)
+    private val duplicateFromId: String? = savedStateHandle["duplicateFromId"]
+
     // Track original state for discard detection
     private var originalState: TransactionDetailUiState? = null
 
@@ -105,6 +108,50 @@ class TransactionDetailViewModel @Inject constructor(
                     // Store original state for discard detection
                     originalState = loadedState
                 }
+            }
+        } ?: duplicateFromId?.let { id ->
+            // Duplicating existing transaction - load data but create new transaction
+            viewModelScope.launch {
+                val profileId = profileContext.getCurrentProfileIdOnce()
+                val baseCurrency = preferencesRepository.getBaseCurrency(profileId).first()
+                val decimalSeparator = preferencesRepository.getDecimalSeparator(profileId).first()
+                val allowWithoutReceipt = preferencesRepository.getAllowExpensesWithoutReceipt().first()
+                val transaction = transactionRepository.getById(id)
+
+                if (transaction == null) {
+                    // Transaction not found (deleted, corrupted DB, etc.)
+                    _uiState.value = _uiState.value.copy(
+                        error = "Transaction not found. It may have been deleted."
+                    )
+                    return@launch
+                }
+
+                // Format amount input with user's preferred decimal separator
+                val formattedInput = NumberFormatter.formatForInput(transaction.amount, decimalSeparator)
+
+                // Calculate draft status based on business rules
+                // Expenses without receipts are drafts (unless user allows expenses without receipts)
+                val isDraft = transaction.type == TransactionType.EXPENSE && !allowWithoutReceipt
+
+                val loadedState = _uiState.value.copy(
+                    isEditing = false,  // Creating new transaction, not editing
+                    date = java.time.LocalDate.now(),  // Set to today
+                    type = transaction.type,
+                    category = transaction.category,
+                    description = transaction.description ?: "",
+                    notes = transaction.notes ?: "",
+                    amount = transaction.amount,
+                    amountInput = formattedInput,
+                    baseCurrency = baseCurrency,
+                    decimalSeparator = decimalSeparator,
+                    receiptPaths = emptyList(),  // Don't copy receipts
+                    originalReceiptPaths = emptyList(),
+                    isDraft = isDraft,  // Auto-determine based on business rules
+                    allowExpensesWithoutReceipt = allowWithoutReceipt
+                )
+                _uiState.value = loadedState
+                // Store original state for discard detection
+                originalState = loadedState
             }
         } ?: run {
             // New transaction - load defaults from preferences

@@ -2,8 +2,10 @@ package io.github.dorumrr.happytaxes.ui.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,10 +23,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import io.github.dorumrr.happytaxes.ui.component.DeleteTransactionDialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -65,6 +70,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LedgerScreen(
     onNavigateToDetail: (String?) -> Unit,
+    onNavigateToDuplicate: (String) -> Unit = {},
     onNavigateToDeleted: () -> Unit,
     onNavigateToSettings: () -> Unit = {},
     onNavigateToReports: () -> Unit = {},
@@ -279,6 +285,9 @@ fun LedgerScreen(
                                         onTransactionClick = { transaction ->
                                             onNavigateToDetail(transaction.id)
                                         },
+                                        onTransactionDuplicate = { transaction ->
+                                            onNavigateToDuplicate(transaction.id)
+                                        },
                                         onTransactionDelete = viewModel::deleteTransaction,
                                         onNavigateToReceiptViewer = onNavigateToReceiptViewer,
                                         scrollToTransactionId = scrollToTransactionId,
@@ -322,6 +331,9 @@ fun LedgerScreen(
                             thousandSeparator = thousandSeparator,
                             onTransactionClick = { transaction ->
                                 onNavigateToDetail(transaction.id)
+                            },
+                            onTransactionDuplicate = { transaction ->
+                                onNavigateToDuplicate(transaction.id)
                             },
                             onTransactionDelete = viewModel::deleteTransaction,
                             onNavigateToReceiptViewer = onNavigateToReceiptViewer,
@@ -632,6 +644,7 @@ private fun TransactionList(
     decimalSeparator: String,
     thousandSeparator: String,
     onTransactionClick: (Transaction) -> Unit,
+    onTransactionDuplicate: (Transaction) -> Unit,
     onTransactionDelete: (String) -> Unit,
     onNavigateToReceiptViewer: (List<String>, Int, String?) -> Unit,
     scrollToTransactionId: String? = null,
@@ -695,6 +708,7 @@ private fun TransactionList(
                 decimalSeparator = decimalSeparator,
                 thousandSeparator = thousandSeparator,
                 onClick = { onTransactionClick(transaction) },
+                onDuplicate = { onTransactionDuplicate(transaction) },
                 onDelete = { onTransactionDelete(transaction.id) },
                 onReceiptClick = { index ->
                     // Pass transaction ID for scroll positioning
@@ -717,6 +731,7 @@ private fun PagedTransactionList(
     decimalSeparator: String,
     thousandSeparator: String,
     onTransactionClick: (Transaction) -> Unit,
+    onTransactionDuplicate: (Transaction) -> Unit,
     onTransactionDelete: (String) -> Unit,
     onNavigateToReceiptViewer: (List<String>, Int, String?) -> Unit,
     scrollToTransactionId: String? = null,
@@ -787,6 +802,7 @@ private fun PagedTransactionList(
                     decimalSeparator = decimalSeparator,
                     thousandSeparator = thousandSeparator,
                     onClick = { onTransactionClick(it) },
+                    onDuplicate = { onTransactionDuplicate(it) },
                     onDelete = { onTransactionDelete(it.id) },
                     onReceiptClick = { receiptIndex ->
                         // Pass transaction ID for scroll positioning
@@ -817,6 +833,7 @@ private fun PagedTransactionList(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TransactionListItem(
     transaction: Transaction,
@@ -824,21 +841,37 @@ private fun TransactionListItem(
     decimalSeparator: String,
     thousandSeparator: String,
     onClick: () -> Unit,
+    onDuplicate: () -> Unit,
     onDelete: () -> Unit,
     onReceiptClick: (Int) -> Unit = {}
 ) {
+    var showContextMenu by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+
     // Edge-to-edge list item with divider (Material 3 style)
     Column(modifier = Modifier.fillMaxWidth()) {
+        // Wrap in Box to properly anchor the dropdown menu
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
+                .background(
+                    if (showContextMenu) {
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    } else {
+                        MaterialTheme.colorScheme.surface
+                    }
+                )
         ) {
             // Foreground (transaction content)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable(onClick = onClick)
+                    .combinedClickable(
+                        onClick = onClick,
+                        onLongClick = { showContextMenu = true }
+                    )
                     .padding(horizontal = Spacing.medium, vertical = Spacing.mediumSmall),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -923,6 +956,60 @@ private fun TransactionListItem(
                         }
                     }
                 }
+            }
+
+            // Context menu (long-press) - centered horizontally
+            DropdownMenu(
+                expanded = showContextMenu,
+                onDismissRequest = { showContextMenu = false },
+                offset = DpOffset(
+                    x = (screenWidth / 2) - 80.dp, // Center the menu (80dp is approx half menu width)
+                    y = 0.dp
+                )
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Edit") },
+                    onClick = {
+                        showContextMenu = false
+                        onClick()
+                    },
+                    leadingIcon = {
+                        Icon(Icons.Default.Edit, contentDescription = null)
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Duplicate") },
+                    onClick = {
+                        showContextMenu = false
+                        onDuplicate()
+                    },
+                    leadingIcon = {
+                        Icon(Icons.Default.ContentCopy, contentDescription = null)
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Delete") },
+                    onClick = {
+                        showContextMenu = false
+                        showDeleteDialog = true
+                    },
+                    leadingIcon = {
+                        Icon(Icons.Default.Delete, contentDescription = null)
+                    }
+                )
+            }
+
+            // Delete confirmation dialog
+            if (showDeleteDialog) {
+                DeleteTransactionDialog(
+                    onConfirm = {
+                        showDeleteDialog = false
+                        onDelete()
+                    },
+                    onDismiss = {
+                        showDeleteDialog = false
+                    }
+                )
             }
         }
 

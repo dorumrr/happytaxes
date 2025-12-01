@@ -76,6 +76,9 @@ fun NavGraph(
                         navController.navigate(Screen.TransactionDetail.route)
                     }
                 },
+                onNavigateToDuplicate = { transactionId ->
+                    navController.navigate(Screen.TransactionDetail.createDuplicateRoute(transactionId))
+                },
                 onNavigateToDeleted = {
                     navController.navigate(Screen.RecentlyDeleted.route)
                 },
@@ -116,6 +119,11 @@ fun NavGraph(
             route = Screen.TransactionDetail.routeWithArgs,
             arguments = listOf(
                 navArgument("transactionId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+                navArgument("duplicateFromId") {
                     type = NavType.StringType
                     nullable = true
                     defaultValue = null
@@ -372,8 +380,9 @@ sealed class Screen(val route: String) {
     object Ledger : Screen("ledger")
 
     object TransactionDetail : Screen("transaction_detail") {
-        const val routeWithArgs = "transaction_detail?transactionId={transactionId}"
+        const val routeWithArgs = "transaction_detail?transactionId={transactionId}&duplicateFromId={duplicateFromId}"
         fun createRoute(transactionId: String) = "transaction_detail?transactionId=$transactionId"
+        fun createDuplicateRoute(duplicateFromId: String) = "transaction_detail?duplicateFromId=$duplicateFromId"
     }
 
     object RecentlyDeleted : Screen("recently_deleted")

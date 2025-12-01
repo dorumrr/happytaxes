@@ -30,6 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import io.github.dorumrr.happytaxes.domain.model.Category
 import io.github.dorumrr.happytaxes.domain.model.Transaction
 import io.github.dorumrr.happytaxes.domain.model.TransactionType
+import io.github.dorumrr.happytaxes.ui.component.DeleteTransactionDialog
 import io.github.dorumrr.happytaxes.ui.component.ReceiptThumbnailList
 import io.github.dorumrr.happytaxes.ui.util.rememberDebouncedNavigation
 import io.github.dorumrr.happytaxes.ui.viewmodel.CategoryViewModel
@@ -759,50 +760,6 @@ private fun DatePickerDialog(
     ) {
         DatePicker(state = datePickerState)
     }
-}
-
-/**
- * Delete transaction confirmation dialog.
- *
- * Shows when user attempts to delete a transaction.
- * Informs user about soft delete and 30-day recovery period.
- */
-@Composable
-private fun DeleteTransactionDialog(
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        icon = {
-            Icon(
-                Icons.Default.Delete,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.error
-            )
-        },
-        title = {
-            Text("Delete Transaction?")
-        },
-        text = {
-            Text("This transaction will be moved to Recently Deleted. You can restore it within 30 days.")
-        },
-        confirmButton = {
-            TextButton(
-                onClick = onConfirm,
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = MaterialTheme.colorScheme.error
-                )
-            ) {
-                Text("Delete")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
-    )
 }
 
 /**

@@ -17,6 +17,7 @@ import java.time.LocalDate
  */
 data class Transaction(
     val id: String,
+    val profileId: String, // Profile this transaction belongs to
     val date: LocalDate,
     val type: TransactionType,
     val category: String,

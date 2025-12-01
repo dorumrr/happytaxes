@@ -231,8 +231,8 @@ class CategoryRepository @Inject constructor(
                                 updatedAt = now,
                                 editHistory = transaction.editHistory + editHistoryEntry
                             )
-                            
-                            TransactionMapper.toEntity(updatedTransaction, profileId)
+
+                            TransactionMapper.toEntity(updatedTransaction)
                         }
                         
                         // Bulk update all transactions

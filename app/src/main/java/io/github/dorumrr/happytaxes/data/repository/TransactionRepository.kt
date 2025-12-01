@@ -112,6 +112,7 @@ class TransactionRepository @Inject constructor(
             val now = Instant.now()
             val transaction = Transaction(
                 id = id ?: UUID.randomUUID().toString(),
+                profileId = profileId,
                 date = date,
                 type = type,
                 category = category,

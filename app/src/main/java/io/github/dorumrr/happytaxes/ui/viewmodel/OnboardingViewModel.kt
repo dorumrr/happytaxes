@@ -243,6 +243,7 @@ class OnboardingViewModel @Inject constructor(
                             val txId = UUID.randomUUID().toString()
                             transactionsToInsert += Transaction(
                                 id = txId,
+                                profileId = profileId,
                                 date = date,
                                 type = TransactionType.INCOME,
                                 category = cat,
@@ -311,6 +312,7 @@ class OnboardingViewModel @Inject constructor(
                             }
                             transactionsToInsert += Transaction(
                                 id = txId,
+                                profileId = profileId,
                                 date = date,
                                 type = TransactionType.EXPENSE,
                                 category = cat,

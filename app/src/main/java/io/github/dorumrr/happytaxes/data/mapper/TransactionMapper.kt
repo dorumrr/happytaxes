@@ -25,6 +25,7 @@ object TransactionMapper {
     fun toDomain(entity: TransactionEntity): Transaction {
         return Transaction(
             id = entity.id,
+            profileId = entity.profileId,
             date = entity.date,
             type = when (entity.type) {
                 io.github.dorumrr.happytaxes.data.local.entity.TransactionType.INCOME ->
@@ -49,13 +50,15 @@ object TransactionMapper {
 
     /**
      * Convert domain model to entity.
+     * Uses the profileId from the domain model to preserve profile association.
      *
-     * TEMPORARY: Uses default profile ID. Will be replaced with proper profile context in Phase 2-3.
+     * @param domain Transaction domain model
+     * @param profileId Optional override for profileId (used only when creating new transactions)
      */
-    fun toEntity(domain: Transaction, profileId: String = ProfileConstants.DEFAULT_PROFILE_ID): TransactionEntity {
+    fun toEntity(domain: Transaction, profileId: String? = null): TransactionEntity {
         return TransactionEntity(
             id = domain.id,
-            profileId = profileId,
+            profileId = profileId ?: domain.profileId, // Use domain's profileId unless explicitly overridden
             date = domain.date,
             type = when (domain.type) {
                 TransactionType.INCOME ->

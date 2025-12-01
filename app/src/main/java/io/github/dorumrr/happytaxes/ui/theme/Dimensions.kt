@@ -83,4 +83,7 @@ object Dimensions {
 
     /** 18dp - Small icon size */
     val iconExtraSmall: Dp = 18.dp
+
+    /** 160dp - Approximate dropdown menu width (for centering calculations) */
+    val dropdownMenuWidth: Dp = 160.dp
 }

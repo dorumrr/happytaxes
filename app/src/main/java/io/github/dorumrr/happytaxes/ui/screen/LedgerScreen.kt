@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import io.github.dorumrr.happytaxes.ui.component.DeleteTransactionDialog
+import io.github.dorumrr.happytaxes.ui.theme.Alpha
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -38,7 +39,6 @@ import androidx.paging.compose.itemKey
 import io.github.dorumrr.happytaxes.domain.model.Transaction
 import io.github.dorumrr.happytaxes.domain.model.TransactionType
 import io.github.dorumrr.happytaxes.ui.component.ReceiptThumbnailGrid
-import io.github.dorumrr.happytaxes.ui.theme.Alpha
 import io.github.dorumrr.happytaxes.ui.theme.CornerRadius
 import io.github.dorumrr.happytaxes.ui.theme.Dimensions
 import io.github.dorumrr.happytaxes.ui.theme.Spacing
@@ -858,7 +858,7 @@ private fun TransactionListItem(
                 .fillMaxWidth()
                 .background(
                     if (showContextMenu) {
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = Alpha.MEDIUM_HIGH)
                     } else {
                         MaterialTheme.colorScheme.surface
                     }
@@ -963,7 +963,7 @@ private fun TransactionListItem(
                 expanded = showContextMenu,
                 onDismissRequest = { showContextMenu = false },
                 offset = DpOffset(
-                    x = (screenWidth / 2) - 80.dp, // Center the menu (80dp is approx half menu width)
+                    x = (screenWidth / 2) - (Dimensions.dropdownMenuWidth / 2),
                     y = 0.dp
                 )
             ) {

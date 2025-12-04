@@ -216,8 +216,10 @@ object InputValidator {
             return Result.failure(ValidationException("Profile name contains invalid characters"))
         }
         
-        // Check for allowed characters (letters, numbers, spaces, and: - _ ( ) & ')
-        val allowedPattern = Regex("^[a-zA-Z0-9 \\-_()&']+$")
+        // Check for allowed characters (Unicode letters/numbers, spaces, and: - _ ( ) & ')
+        // \p{L} = any Unicode letter (includes accented chars, non-Latin scripts)
+        // \p{N} = any Unicode number
+        val allowedPattern = Regex("^[\\p{L}\\p{N} \\-_()&']+$")
         if (!allowedPattern.matches(trimmed)) {
             return Result.failure(ValidationException("Profile name contains invalid characters. Allowed: letters, numbers, spaces, - _ ( ) & '"))
         }
@@ -260,8 +262,10 @@ object InputValidator {
             return Result.failure(ValidationException("Category name contains invalid characters"))
         }
         
-        // Check for allowed characters (letters, numbers, spaces, and: - _ ( ) & ' / ,)
-        val allowedPattern = Regex("^[a-zA-Z0-9 \\-_()&'/,]+$")
+        // Check for allowed characters (Unicode letters/numbers, spaces, and: - _ ( ) & ' / ,)
+        // \p{L} = any Unicode letter (includes accented chars, non-Latin scripts)
+        // \p{N} = any Unicode number
+        val allowedPattern = Regex("^[\\p{L}\\p{N} \\-_()&'/,]+$")
         if (!allowedPattern.matches(trimmed)) {
             return Result.failure(ValidationException("Category name contains invalid characters. Allowed: letters, numbers, spaces, - _ ( ) & ' / ,"))
         }

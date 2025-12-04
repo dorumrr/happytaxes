@@ -481,7 +481,8 @@ install_app() {
 
     # Uninstall existing app
     print_info "Uninstalling existing app..."
-    if adb shell pm list packages | grep -q "$PACKAGE_NAME"; then
+    # Use --user 0 to query primary user (avoids permission errors on multi-profile devices)
+    if adb shell pm list packages --user 0 2>/dev/null | grep -q "$PACKAGE_NAME"; then
         adb uninstall "$PACKAGE_NAME" 2>/dev/null || true
         print_success "App uninstalled"
     else
@@ -522,7 +523,8 @@ update_app() {
 
     # Check if app is currently installed
     local app_installed=false
-    if adb shell pm list packages | grep -q "$PACKAGE_NAME"; then
+    # Use --user 0 to query primary user (avoids permission errors on multi-profile devices)
+    if adb shell pm list packages --user 0 2>/dev/null | grep -q "$PACKAGE_NAME"; then
         app_installed=true
         print_info "App is currently installed - data will be preserved"
     else

@@ -1,0 +1,2 @@
+- Enhanced input validation to support Unicode characters in profile and category names
+- Fixed the biometric authentication lock screen

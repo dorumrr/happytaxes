@@ -34,8 +34,8 @@ android {
         applicationId = "io.github.dorumrr.happytaxes"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
-        versionName = "1.0.5"
+        versionCode = 7
+        versionName = "1.0.6"
 
         // Reduce APK size by excluding x86/x86_64 ABIs (emulators and rare devices)
         // Keeps arm64-v8a and armeabi-v7a which cover 99%+ of real Android devices

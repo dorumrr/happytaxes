@@ -4,12 +4,18 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.fragment.app.FragmentActivity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,8 +33,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -78,8 +86,9 @@ class MainActivity : FragmentActivity() {
                 .collectAsState(initial = false)
 
             // Get biometric auth preference
+            // Initial value is true (assume locked) for security - prevents content flash before preference loads
             val biometricAuthEnabled by preferencesRepository.getBiometricAuthEnabled()
-                .collectAsState(initial = false)
+                .collectAsState(initial = true)
 
             // Get auto-lock timeout preference
             val autoLockTimeout by preferencesRepository.getAutoLockTimeout()
@@ -170,8 +179,41 @@ class MainActivity : FragmentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // Only show app content when authenticated (or auth not required)
-                    if (isAuthenticated) {
+                    // Show lock screen when authentication is required but not yet completed
+                    if (!isAuthenticated && biometricAuthEnabled) {
+                        // Privacy screen - covers content while biometric dialog is shown
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colorScheme.background)
+                                .padding(top = 120.dp),
+                            contentAlignment = Alignment.TopCenter
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Lock,
+                                    contentDescription = "Locked",
+                                    modifier = Modifier.size(64.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "HappyTaxes",
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "Authenticate to continue",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    } else if (isAuthenticated) {
+                        // Only show app content when authenticated (or auth not required)
                         // Wait for DataStore to load before determining start destination
                         val startDestination by produceState<String?>(initialValue = null) {
                         val onboardingComplete = preferencesRepository.isOnboardingComplete().first()

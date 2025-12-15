@@ -65,6 +65,10 @@ data class TransactionEntity(
     // Demo data flag (for onboarding sample transactions)
     val isDemoData: Boolean = false,
 
+    // Tax deductibility (for expenses only, always true for income)
+    // Default: true (backward compatible - existing expenses remain deductible)
+    val isTaxDeductible: Boolean = true,
+
     // Soft delete
     val isDeleted: Boolean = false,
     val deletedAt: Instant? = null,

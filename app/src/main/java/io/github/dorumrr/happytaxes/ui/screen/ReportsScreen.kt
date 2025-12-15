@@ -187,9 +187,42 @@ fun ReportsScreen(
                             thousandSeparator = thousandSeparator
                         )
 
+                        Spacer(modifier = Modifier.height(Spacing.medium))
+
+                        // Expense Breakdown Section
+                        Text(
+                            text = "Expense Breakdown",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+
                         Spacer(modifier = Modifier.height(Spacing.small))
 
-                        // Expenses
+                        // Tax Deductible Expenses
+                        SummaryRow(
+                            label = "  Tax Deductible",
+                            amount = reportData.totalDeductibleExpenses,
+                            isPositive = false,
+                            baseCurrency = uiState.baseCurrency,
+                            decimalSeparator = decimalSeparator,
+                            thousandSeparator = thousandSeparator
+                        )
+
+                        Spacer(modifier = Modifier.height(Spacing.extraSmall))
+
+                        // Non-Deductible Expenses
+                        SummaryRow(
+                            label = "  Non-Deductible",
+                            amount = reportData.totalNonDeductibleExpenses,
+                            isPositive = false,
+                            baseCurrency = uiState.baseCurrency,
+                            decimalSeparator = decimalSeparator,
+                            thousandSeparator = thousandSeparator
+                        )
+
+                        Spacer(modifier = Modifier.height(Spacing.small))
+
+                        // Total Expenses
                         SummaryRow(
                             label = "Total Expenses",
                             amount = reportData.totalExpenses,
@@ -205,15 +238,35 @@ fun ReportsScreen(
 
                         Spacer(modifier = Modifier.height(Spacing.small))
 
-                        // Net Profit
+                        // Net Profit (All Expenses)
                         SummaryRow(
-                            label = "Net Profit",
+                            label = "Net Profit (All Expenses)",
                             amount = reportData.netProfit,
                             isPositive = reportData.netProfit >= BigDecimal.ZERO,
                             isBold = true,
                             baseCurrency = uiState.baseCurrency,
                             decimalSeparator = decimalSeparator,
                             thousandSeparator = thousandSeparator
+                        )
+
+                        Spacer(modifier = Modifier.height(Spacing.small))
+
+                        // Net Taxable Profit (For Tax Filing)
+                        SummaryRow(
+                            label = "Net Taxable Profit",
+                            amount = reportData.netTaxableProfit,
+                            isPositive = reportData.netTaxableProfit >= BigDecimal.ZERO,
+                            isBold = true,
+                            baseCurrency = uiState.baseCurrency,
+                            decimalSeparator = decimalSeparator,
+                            thousandSeparator = thousandSeparator
+                        )
+
+                        Text(
+                            text = "(Deductible expenses only - for tax filing)",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(start = Spacing.medium)
                         )
                     }
                 }

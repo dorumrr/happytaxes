@@ -27,7 +27,10 @@ data class ReportData(
     val endDate: LocalDate,
     val totalIncome: BigDecimal,
     val totalExpenses: BigDecimal,
+    val totalDeductibleExpenses: BigDecimal,  // Tax deductible expenses only
+    val totalNonDeductibleExpenses: BigDecimal,  // Non-deductible expenses
     val netProfit: BigDecimal,
+    val netTaxableProfit: BigDecimal,  // Income - deductible expenses (for tax filing)
     val transactionCount: Int,
     val incomeTransactionCount: Int,
     val expenseTransactionCount: Int,

@@ -77,6 +77,7 @@ class TransactionRepository @Inject constructor(
         notes: String?,
         amount: java.math.BigDecimal,
         receiptPaths: List<String> = emptyList(),
+        isTaxDeductible: Boolean = true,
         skipDuplicateCheck: Boolean = false
     ): Result<Transaction> {
         return ConcurrencyHelper.withTransactionLock {
@@ -121,6 +122,7 @@ class TransactionRepository @Inject constructor(
                 amount = amount,
                 receiptPaths = receiptPaths,
                 isDraft = isDraft,
+                isTaxDeductible = isTaxDeductible,
                 isDeleted = false,
                 deletedAt = null,
                 createdAt = now,
@@ -309,6 +311,7 @@ class TransactionRepository @Inject constructor(
         notes: String?,
         amount: java.math.BigDecimal,
         receiptPaths: List<String> = emptyList(),
+        isTaxDeductible: Boolean = true,
         isDraft: Boolean? = null,  // null = don't change, true/false = set value
         skipDuplicateCheck: Boolean = false
     ): Result<Transaction> {
@@ -346,6 +349,15 @@ class TransactionRepository @Inject constructor(
                         "amount",
                         existing.amount.toPlainString(),
                         amount.toPlainString()
+                    )
+                )
+            }
+            if (existing.isTaxDeductible != isTaxDeductible) {
+                changes.add(
+                    FieldChange(
+                        "isTaxDeductible",
+                        existing.isTaxDeductible.toString(),
+                        isTaxDeductible.toString()
                     )
                 )
             }
@@ -387,6 +399,7 @@ class TransactionRepository @Inject constructor(
                 notes = notes,
                 amount = amount,
                 receiptPaths = receiptPaths,
+                isTaxDeductible = isTaxDeductible,
                 isDraft = finalIsDraft,
                 updatedAt = Instant.now(),
                 editHistory = updatedHistory

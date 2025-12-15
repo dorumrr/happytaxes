@@ -37,6 +37,7 @@ import io.github.dorumrr.happytaxes.data.local.entity.TransactionEntity
  * - Version 13: Added multi-profile support - added profiles table, added profileId to transactions/categories/search_history
  * - Version 14: Added isDemoData flag to transactions table for identifying demo/sample transactions
  * - Version 15: Added unique constraint on categories (profileId, name, type) and deduplicated existing categories
+ * - Version 16: Added isTaxDeductible flag to transactions table for marking non-deductible expenses
  *
  * Entities: profiles, transactions, categories, search_history
  */
@@ -47,7 +48,7 @@ import io.github.dorumrr.happytaxes.data.local.entity.TransactionEntity
         CategoryEntity::class,
         SearchHistoryEntity::class
     ],
-    version = 15,
+    version = 16,
     exportSchema = true
 )
 @TypeConverters(Converters::class)

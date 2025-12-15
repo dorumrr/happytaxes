@@ -483,6 +483,39 @@ fun TransactionDetailScreen(
                     }
             )
 
+            // Tax Deductible Checkbox (only for expenses)
+            if (uiState.type == TransactionType.EXPENSE) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            viewModel.onTaxDeductibleChanged(!uiState.isTaxDeductible)
+                        }
+                        .padding(vertical = Spacing.extraSmall),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = uiState.isTaxDeductible,
+                        onCheckedChange = { viewModel.onTaxDeductibleChanged(it) }
+                    )
+                    Spacer(modifier = Modifier.width(Spacing.small))
+                    Column {
+                        Text(
+                            text = "Tax deductible",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            text = "Claim this on tax return",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
             // Description (multi-line textarea)
             OutlinedTextField(
                 value = uiState.description,

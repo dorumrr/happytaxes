@@ -149,6 +149,7 @@ class CsvExporter @Inject constructor(
                 "Category",
                 "Description",
                 "Amount ($baseCurrency)",
+                "Tax Deductible",
                 "Receipt",
                 "Notes",
                 "Draft"
@@ -164,6 +165,11 @@ class CsvExporter @Inject constructor(
                 transaction.category,
                 transaction.description ?: "",
                 transaction.amount.toPlainString(),
+                when {
+                    transaction.type == io.github.dorumrr.happytaxes.domain.model.TransactionType.INCOME -> "N/A"
+                    transaction.isTaxDeductible -> "Yes"
+                    else -> "No"
+                },
                 if (transaction.receiptPaths.isNotEmpty()) "Yes" else "No",
                 transaction.notes ?: "",
                 if (transaction.isDraft) "Yes" else "No"
@@ -199,6 +205,7 @@ class CsvExporter @Inject constructor(
                     "Category",
                     "Description",
                     "Amount ($baseCurrency)",
+                    "Tax Deductible",
                     "Receipt",
                     "Notes",
                     "Draft"
@@ -214,6 +221,11 @@ class CsvExporter @Inject constructor(
                         transaction.category,
                         transaction.description ?: "",
                         transaction.amount.toPlainString(),
+                        when {
+                            transaction.type == io.github.dorumrr.happytaxes.domain.model.TransactionType.INCOME -> "N/A"
+                            transaction.isTaxDeductible -> "Yes"
+                            else -> "No"
+                        },
                         if (transaction.receiptPaths.isNotEmpty()) "Yes" else "No",
                         transaction.notes ?: "",
                         if (transaction.isDraft) "Yes" else "No"

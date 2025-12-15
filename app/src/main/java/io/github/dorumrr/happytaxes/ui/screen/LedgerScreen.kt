@@ -955,6 +955,23 @@ private fun TransactionListItem(
                             )
                         }
                     }
+                    // Show non-deductible indicator for expenses only
+                    if (transaction.type == TransactionType.EXPENSE && !transaction.isTaxDeductible) {
+                        Spacer(modifier = Modifier.height(Spacing.extraSmall))
+                        Badge(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer
+                        ) {
+                            Text(
+                                text = "NOT DEDUCTIBLE",
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier.padding(
+                                    horizontal = Spacing.verySmall,
+                                    vertical = Spacing.extraExtraSmall
+                                )
+                            )
+                        }
+                    }
                 }
             }
 

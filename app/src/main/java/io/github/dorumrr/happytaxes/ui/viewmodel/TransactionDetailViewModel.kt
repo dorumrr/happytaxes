@@ -102,7 +102,8 @@ class TransactionDetailViewModel @Inject constructor(
                         decimalSeparator = decimalSeparator,  // Store user's preferred separator
                         receiptPaths = it.receiptPaths,
                         originalReceiptPaths = it.receiptPaths,  // Store original for tracking
-                        isDraft = it.isDraft
+                        isDraft = it.isDraft,
+                        isTaxDeductible = it.isTaxDeductible
                     )
                     _uiState.value = loadedState
                     // Store original state for discard detection
@@ -147,6 +148,7 @@ class TransactionDetailViewModel @Inject constructor(
                     receiptPaths = emptyList(),  // Don't copy receipts
                     originalReceiptPaths = emptyList(),
                     isDraft = isDraft,  // Auto-determine based on business rules
+                    isTaxDeductible = transaction.isTaxDeductible,  // Copy tax deductible status
                     allowExpensesWithoutReceipt = allowWithoutReceipt
                 )
                 _uiState.value = loadedState
@@ -210,6 +212,10 @@ class TransactionDetailViewModel @Inject constructor(
             amount = parsedAmount ?: BigDecimal.ZERO
         )
         validateForm()
+    }
+
+    fun onTaxDeductibleChanged(isTaxDeductible: Boolean) {
+        _uiState.value = _uiState.value.copy(isTaxDeductible = isTaxDeductible)
     }
 
     /**
@@ -611,6 +617,7 @@ class TransactionDetailViewModel @Inject constructor(
                     notes = state.notes.ifBlank { null },
                     amount = state.amount,
                     receiptPaths = state.receiptPaths,
+                    isTaxDeductible = state.isTaxDeductible,
                     skipDuplicateCheck = skipDuplicateCheck
                 )
             } else {
@@ -625,6 +632,7 @@ class TransactionDetailViewModel @Inject constructor(
                     notes = state.notes.ifBlank { null },
                     amount = state.amount,
                     receiptPaths = state.receiptPaths,
+                    isTaxDeductible = state.isTaxDeductible,
                     skipDuplicateCheck = skipDuplicateCheck
                 )
             }
@@ -915,6 +923,7 @@ data class TransactionDetailUiState(
     val addedReceiptPaths: List<String> = emptyList(),  // Newly added receipts (for cleanup on discard)
     val removedReceiptPaths: List<String> = emptyList(),  // Removed receipts (for cleanup on save)
     val isDraft: Boolean = false,
+    val isTaxDeductible: Boolean = true,  // Tax deductibility (for expenses only)
     val validationErrors: List<String> = emptyList(),
     val isValid: Boolean = false,
     val isSaving: Boolean = false,

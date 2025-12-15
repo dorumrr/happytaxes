@@ -317,7 +317,31 @@ class PdfExporter @Inject constructor(
         )
         y += 25
 
-        // Expenses
+        // Expense Breakdown
+        canvas.drawText("Expense Breakdown:", MARGIN.toFloat(), y, headingPaint)
+        y += 25
+
+        // Tax Deductible Expenses
+        canvas.drawText("  Tax Deductible:", (MARGIN + 20).toFloat(), y, bodyPaint)
+        canvas.drawText(
+            "$currencySymbol${formatAmount(reportData.totalDeductibleExpenses, decimalSeparator, thousandSeparator)}",
+            (PAGE_WIDTH - MARGIN - 150).toFloat(),
+            y,
+            bodyPaint
+        )
+        y += 20
+
+        // Non-Deductible Expenses
+        canvas.drawText("  Non-Deductible:", (MARGIN + 20).toFloat(), y, bodyPaint)
+        canvas.drawText(
+            "$currencySymbol${formatAmount(reportData.totalNonDeductibleExpenses, decimalSeparator, thousandSeparator)}",
+            (PAGE_WIDTH - MARGIN - 150).toFloat(),
+            y,
+            bodyPaint
+        )
+        y += 20
+
+        // Total Expenses
         canvas.drawText("Total Expenses:", MARGIN.toFloat(), y, bodyPaint)
         canvas.drawText(
             "$currencySymbol${formatAmount(reportData.totalExpenses, decimalSeparator, thousandSeparator)}",
@@ -325,7 +349,7 @@ class PdfExporter @Inject constructor(
             y,
             bodyPaint
         )
-        y += 25
+        y += 30
 
         // Draw line
         val linePaint = Paint().apply {
@@ -341,7 +365,7 @@ class PdfExporter @Inject constructor(
         )
         y += 15
 
-        // Net Profit
+        // Net Profit (Bookkeeping)
         val profitColor = if (reportData.netProfit >= BigDecimal.ZERO) {
             Color.rgb(46, 125, 50)  // Green
         } else {
@@ -353,14 +377,37 @@ class PdfExporter @Inject constructor(
             isAntiAlias = true
             isFakeBoldText = true
         }
-        canvas.drawText("Net Profit:", MARGIN.toFloat(), y, profitPaint)
+        canvas.drawText("Net Profit (All Expenses):", MARGIN.toFloat(), y, profitPaint)
         canvas.drawText(
             "$currencySymbol${formatAmount(reportData.netProfit, decimalSeparator, thousandSeparator)}",
             (PAGE_WIDTH - MARGIN - 150).toFloat(),
             y,
             profitPaint
         )
-        y += 40
+        y += 25
+
+        // Net Taxable Profit (For Tax Filing)
+        val taxProfitColor = if (reportData.netTaxableProfit >= BigDecimal.ZERO) {
+            Color.rgb(46, 125, 50)  // Green
+        } else {
+            Color.rgb(198, 40, 40)  // Red
+        }
+        val taxProfitPaint = Paint().apply {
+            color = taxProfitColor
+            textSize = 16f
+            isAntiAlias = true
+            isFakeBoldText = true
+        }
+        canvas.drawText("Net Taxable Profit:", MARGIN.toFloat(), y, taxProfitPaint)
+        canvas.drawText(
+            "$currencySymbol${formatAmount(reportData.netTaxableProfit, decimalSeparator, thousandSeparator)}",
+            (PAGE_WIDTH - MARGIN - 150).toFloat(),
+            y,
+            taxProfitPaint
+        )
+        y += 10
+        canvas.drawText("(Deductible expenses only)", (MARGIN + 20).toFloat(), y, smallPaint)
+        y += 30
 
         // Footer
         canvas.drawText(

@@ -42,7 +42,7 @@ class DatabaseIntegrityChecker @Inject constructor(
          * Current database version from HappyTaxesDatabase.
          * This should match the version in @Database annotation.
          */
-        private const val CURRENT_DB_VERSION = 15
+        private const val CURRENT_DB_VERSION = 16
     }
     
     /**

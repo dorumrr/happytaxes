@@ -77,7 +77,16 @@ class ReportRepository @Inject constructor(
 
             val totalIncome = incomeTransactions.sumOf { it.amount }
             val totalExpenses = expenseTransactions.sumOf { it.amount }
+
+            // Calculate deductible vs non-deductible expenses
+            val deductibleExpenses = expenseTransactions.filter { it.isTaxDeductible }
+            val nonDeductibleExpenses = expenseTransactions.filter { !it.isTaxDeductible }
+
+            val totalDeductibleExpenses = deductibleExpenses.sumOf { it.amount }
+            val totalNonDeductibleExpenses = nonDeductibleExpenses.sumOf { it.amount }
+
             val netProfit = totalIncome - totalExpenses
+            val netTaxableProfit = totalIncome - totalDeductibleExpenses  // For tax filing
 
             // Category breakdown
             val categoryBreakdown = calculateCategoryBreakdown(
@@ -95,7 +104,10 @@ class ReportRepository @Inject constructor(
                 endDate = endDate,
                 totalIncome = totalIncome,
                 totalExpenses = totalExpenses,
+                totalDeductibleExpenses = totalDeductibleExpenses,
+                totalNonDeductibleExpenses = totalNonDeductibleExpenses,
                 netProfit = netProfit,
+                netTaxableProfit = netTaxableProfit,
                 transactionCount = transactions.size,
                 incomeTransactionCount = incomeTransactions.size,
                 expenseTransactionCount = expenseTransactions.size,

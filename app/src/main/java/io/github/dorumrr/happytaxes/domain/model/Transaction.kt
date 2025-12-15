@@ -27,6 +27,7 @@ data class Transaction(
     val receiptPaths: List<String>,  // Multiple receipts supported
     val isDraft: Boolean,
     val isDemoData: Boolean = false, // Flag for demo/sample transactions
+    val isTaxDeductible: Boolean = true, // Tax deductibility (for expenses only, always true for income)
     val isDeleted: Boolean,
     val deletedAt: Instant?,
     val createdAt: Instant,

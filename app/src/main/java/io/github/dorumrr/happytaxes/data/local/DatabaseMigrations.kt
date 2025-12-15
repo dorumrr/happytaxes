@@ -22,6 +22,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  * - Version 13: Added multi-profile support - added profiles table, added profileId to transactions/categories/search_history
  * - Version 14: Added isDemoData flag to transactions table for identifying demo/sample transactions
  * - Version 15: Added unique constraint on categories (profileId, name, type) and deduplicated existing categories
+ * - Version 16: Added isTaxDeductible flag to transactions table for marking non-deductible expenses
+ * - Version 15: Added unique constraint on categories (profileId, name, type) and deduplicated existing categories
  */
 object DatabaseMigrations {
     
@@ -750,6 +752,23 @@ object DatabaseMigrations {
     }
 
     /**
+     * Migration from version 15 to version 16.
+     *
+     * Changes:
+     * 1. Add isTaxDeductible column to transactions table (default true)
+     *
+     * Strategy:
+     * - Add column with default value true (backward compatible - existing expenses remain deductible)
+     */
+    val MIGRATION_15_16 = object : Migration(15, 16) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // Add isTaxDeductible column to transactions table
+            // Default: true (backward compatible - all existing transactions are tax deductible)
+            database.execSQL("ALTER TABLE transactions ADD COLUMN isTaxDeductible INTEGER NOT NULL DEFAULT 1")
+        }
+    }
+
+    /**
      * Get all migrations for the database.
      * Add new migrations here as the database evolves.
      */
@@ -766,7 +785,8 @@ object DatabaseMigrations {
             MIGRATION_11_12,
             MIGRATION_12_13,
             MIGRATION_13_14,
-            MIGRATION_14_15
+            MIGRATION_14_15,
+            MIGRATION_15_16
         )
     }
 }

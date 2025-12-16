@@ -23,7 +23,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  * - Version 14: Added isDemoData flag to transactions table for identifying demo/sample transactions
  * - Version 15: Added unique constraint on categories (profileId, name, type) and deduplicated existing categories
  * - Version 16: Added isTaxDeductible flag to transactions table for marking non-deductible expenses
- * - Version 15: Added unique constraint on categories (profileId, name, type) and deduplicated existing categories
  */
 object DatabaseMigrations {
     

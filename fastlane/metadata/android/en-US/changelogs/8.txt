@@ -1,0 +1,2 @@
+Added non-deductible transaction option
+Update date format in exports to ISO 8601 for better compatibility

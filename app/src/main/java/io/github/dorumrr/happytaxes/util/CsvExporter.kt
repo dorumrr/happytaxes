@@ -35,7 +35,9 @@ class CsvExporter @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
-    private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    // Use ISO 8601 date format (YYYY-MM-DD) for universal compatibility
+    // This format is unambiguous and correctly parsed by all spreadsheet applications
+    private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
     
     companion object {
         /**

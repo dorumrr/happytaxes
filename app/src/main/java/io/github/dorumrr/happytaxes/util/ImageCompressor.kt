@@ -3,6 +3,7 @@ package io.github.dorumrr.happytaxes.util
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import androidx.exifinterface.media.ExifInterface
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -96,7 +97,8 @@ class ImageCompressor @Inject constructor(
      * - Max 1600px longest side
      * - 65% JPEG quality
      * - Never upscale smaller images
-     * - Preserve EXIF data
+     * - Preserve EXIF data (except orientation which is applied to pixels)
+     * - Apply EXIF orientation to pixels for universal compatibility
      * 
      * @param sourceUri Source image URI (from camera or gallery)
      * @param destinationFile Destination file for compressed image
@@ -118,23 +120,36 @@ class ImageCompressor @Inject constructor(
                 null // EXIF data not available, continue without it
             }
             
-            // Step 3: Get image dimensions
-            val (width, height) = getImageDimensions(tempFile)
+            // Step 3: Get EXIF orientation and apply rotation to pixels
+            // This ensures the image displays correctly in all apps/viewers
+            val orientation = sourceExif?.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_NORMAL
+            ) ?: ExifInterface.ORIENTATION_NORMAL
             
-            // Step 4: Calculate target dimensions (never upscale)
+            val rotatedTempFile = if (orientation != ExifInterface.ORIENTATION_NORMAL) {
+                applyExifOrientationToFile(tempFile, orientation)
+            } else {
+                tempFile
+            }
+            
+            // Step 4: Get image dimensions (after rotation)
+            val (width, height) = getImageDimensions(rotatedTempFile)
+            
+            // Step 5: Calculate target dimensions (never upscale)
             val (targetWidth, targetHeight) = calculateTargetDimensions(width, height)
             
-            // Step 5: Compress image
+            // Step 6: Compress image
             val compressedFile = if (targetWidth == width && targetHeight == height) {
                 // No resizing needed, just compress quality
-                Compressor.compress(context, tempFile) {
+                Compressor.compress(context, rotatedTempFile) {
                     quality(JPEG_QUALITY)
                     format(Bitmap.CompressFormat.JPEG)
                     destination(destinationFile)
                 }
             } else {
                 // Resize and compress
-                Compressor.compress(context, tempFile) {
+                Compressor.compress(context, rotatedTempFile) {
                     resolution(targetWidth, targetHeight)
                     quality(JPEG_QUALITY)
                     format(Bitmap.CompressFormat.JPEG)
@@ -142,18 +157,101 @@ class ImageCompressor @Inject constructor(
                 }
             }
             
-            // Step 6: Preserve EXIF data
+            // Step 7: Preserve EXIF data (but set orientation to normal since we applied it)
             sourceExif?.let { source ->
-                preserveExifData(source, compressedFile)
+                preserveExifData(source, compressedFile, resetOrientation = true)
             }
             
-            // Step 7: Clean up temp file
+            // Step 8: Clean up temp files
             tempFile.delete()
+            if (rotatedTempFile != tempFile) {
+                rotatedTempFile.delete()
+            }
             
             Result.success(compressedFile)
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+    
+    /**
+     * Apply EXIF orientation to image pixels and save to a new file.
+     * This physically rotates/flips the image so it displays correctly everywhere.
+     * 
+     * Uses subsampling for very large images to prevent OOM errors.
+     */
+    private fun applyExifOrientationToFile(sourceFile: File, orientation: Int): File {
+        // First, get image dimensions to determine if we need subsampling
+        val boundsOptions = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
+        }
+        BitmapFactory.decodeFile(sourceFile.absolutePath, boundsOptions)
+        
+        val imageWidth = boundsOptions.outWidth
+        val imageHeight = boundsOptions.outHeight
+        
+        if (imageWidth <= 0 || imageHeight <= 0) {
+            return sourceFile
+        }
+        
+        // Calculate sample size to keep memory usage reasonable
+        // Target: max ~16MP in memory (4096x4096) which is safe for most devices
+        // The final compression will resize anyway, so we just need enough resolution
+        val maxPixelsInMemory = 16 * 1024 * 1024 // 16 megapixels
+        val totalPixels = imageWidth.toLong() * imageHeight.toLong()
+        
+        var sampleSize = 1
+        while (totalPixels / (sampleSize * sampleSize) > maxPixelsInMemory) {
+            sampleSize *= 2
+        }
+        
+        // Decode bitmap with calculated sample size
+        val decodeOptions = BitmapFactory.Options().apply {
+            inSampleSize = sampleSize
+        }
+        val bitmap = BitmapFactory.decodeFile(sourceFile.absolutePath, decodeOptions)
+            ?: return sourceFile
+        
+        // Create transformation matrix based on EXIF orientation
+        val matrix = Matrix()
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+            ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> matrix.postScale(-1f, 1f)
+            ExifInterface.ORIENTATION_FLIP_VERTICAL -> matrix.postScale(1f, -1f)
+            ExifInterface.ORIENTATION_TRANSPOSE -> {
+                matrix.postRotate(90f)
+                matrix.postScale(-1f, 1f)
+            }
+            ExifInterface.ORIENTATION_TRANSVERSE -> {
+                matrix.postRotate(-90f)
+                matrix.postScale(-1f, 1f)
+            }
+            else -> {
+                bitmap.recycle()
+                return sourceFile // No transformation needed
+            }
+        }
+        
+        // Apply transformation
+        val rotatedBitmap = Bitmap.createBitmap(
+            bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
+        )
+        
+        // Save to new temp file with high quality (compression happens later)
+        val rotatedFile = createTempFile(context)
+        FileOutputStream(rotatedFile).use { out ->
+            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+        }
+        
+        // Clean up bitmaps
+        if (rotatedBitmap != bitmap) {
+            rotatedBitmap.recycle()
+        }
+        bitmap.recycle()
+        
+        return rotatedFile
     }
     
     /**
@@ -206,8 +304,12 @@ class ImageCompressor @Inject constructor(
      * Preserve EXIF data from source to destination.
      * 
      * Copies all EXIF tags to ensure no metadata is lost.
+     * 
+     * @param sourceExif Source EXIF interface
+     * @param destinationFile Destination file to write EXIF to
+     * @param resetOrientation If true, set orientation to NORMAL (1) since rotation was applied to pixels
      */
-    private fun preserveExifData(sourceExif: ExifInterface, destinationFile: File) {
+    private fun preserveExifData(sourceExif: ExifInterface, destinationFile: File, resetOrientation: Boolean = false) {
         try {
             val destExif = ExifInterface(destinationFile.absolutePath)
             
@@ -216,6 +318,14 @@ class ImageCompressor @Inject constructor(
                 sourceExif.getAttribute(tag)?.let { value ->
                     destExif.setAttribute(tag, value)
                 }
+            }
+            
+            // Reset orientation to normal if rotation was applied to pixels
+            if (resetOrientation) {
+                destExif.setAttribute(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL.toString()
+                )
             }
             
             // Save EXIF data to file

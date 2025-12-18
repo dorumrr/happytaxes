@@ -200,6 +200,14 @@ fun SettingsScreen(
                     onCheckedChange = { viewModel.setAllowExpensesWithoutReceipt(it) }
                 )
 
+                SettingsSwitchItem(
+                    icon = Icons.Default.Warning,
+                    title = "Duplicate Warning",
+                    subtitle = "Alert when similar transaction exists (±7 days, same amount)",
+                    checked = uiState.duplicateWarningEnabled,
+                    onCheckedChange = { viewModel.setDuplicateWarningEnabled(it) }
+                )
+
                 SettingsItem(
                     icon = Icons.Default.SwapVert,
                     title = "Default Transaction Type",

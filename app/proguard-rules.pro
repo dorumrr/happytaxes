@@ -48,3 +48,9 @@
 -keep class com.googlecode.tesseract.android.** { *; }
 -dontwarn com.googlecode.tesseract.android.**
 
+# Reproducible builds for F-Droid
+# Keep source file and line numbers for stack traces (via mapping file)
+-keepattributes SourceFile,LineNumberTable
+# Make source file attribute deterministic (removes non-deterministic r8-map-id hash)
+-renamesourcefileattribute SourceFile
+

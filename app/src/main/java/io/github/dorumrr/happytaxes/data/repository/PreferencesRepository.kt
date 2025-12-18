@@ -68,6 +68,9 @@ class PreferencesRepository @Inject constructor(
         // Receipt requirement (GLOBAL)
         private val ALLOW_EXPENSES_WITHOUT_RECEIPT = booleanPreferencesKey("allow_expenses_without_receipt")
 
+        // Duplicate detection (GLOBAL)
+        private val DUPLICATE_WARNING_ENABLED = booleanPreferencesKey("duplicate_warning_enabled")
+
         // Appearance (GLOBAL)
         private val THEME = stringPreferencesKey("theme") // "light", "dark", "auto"
         private val ADD_BUTTON_POSITION = stringPreferencesKey("add_button_position") // "top", "fab", or "both"
@@ -669,6 +672,32 @@ class PreferencesRepository @Inject constructor(
     suspend fun setAllowExpensesWithoutReceipt(allow: Boolean) {
         dataStore.edit { preferences ->
             preferences[ALLOW_EXPENSES_WITHOUT_RECEIPT] = allow
+        }
+    }
+
+    // ========== DUPLICATE DETECTION (GLOBAL) ==========
+
+    /**
+     * Check if duplicate transaction warning is enabled (GLOBAL).
+     * Default: true (show warning when potential duplicate detected)
+     *
+     * When disabled, transactions are saved without duplicate checking.
+     * Useful for personal finance tracking where duplicates are common
+     * (e.g., multiple purchases of the same amount on the same day).
+     */
+    fun getDuplicateWarningEnabled(): Flow<Boolean> {
+        return dataStore.data.map { preferences ->
+            preferences[DUPLICATE_WARNING_ENABLED] ?: true
+        }
+    }
+
+    /**
+     * Set duplicate warning enabled/disabled (GLOBAL).
+     * @param enabled true to show duplicate warnings, false to skip duplicate checking
+     */
+    suspend fun setDuplicateWarningEnabled(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[DUPLICATE_WARNING_ENABLED] = enabled
         }
     }
 

@@ -607,6 +607,10 @@ class TransactionDetailViewModel @Inject constructor(
         _uiState.value = state.copy(isSaving = true, error = null)
 
         viewModelScope.launch {
+            // Check if duplicate warning is disabled in preferences
+            val duplicateWarningEnabled = preferencesRepository.getDuplicateWarningEnabled().first()
+            val effectiveSkipDuplicateCheck = skipDuplicateCheck || !duplicateWarningEnabled
+
             val result = if (state.isEditing && transactionId != null) {
                 // Update existing transaction
                 transactionRepository.updateTransaction(
@@ -618,7 +622,7 @@ class TransactionDetailViewModel @Inject constructor(
                     amount = state.amount,
                     receiptPaths = state.receiptPaths,
                     isTaxDeductible = state.isTaxDeductible,
-                    skipDuplicateCheck = skipDuplicateCheck
+                    skipDuplicateCheck = effectiveSkipDuplicateCheck
                 )
             } else {
                 // Create new transaction with tempTransactionId
@@ -633,7 +637,7 @@ class TransactionDetailViewModel @Inject constructor(
                     amount = state.amount,
                     receiptPaths = state.receiptPaths,
                     isTaxDeductible = state.isTaxDeductible,
-                    skipDuplicateCheck = skipDuplicateCheck
+                    skipDuplicateCheck = effectiveSkipDuplicateCheck
                 )
             }
 

@@ -1,0 +1,3 @@
+Fixed image orientation for camera capture
+Improve reproducible build compatibility
+Add option to disable duplicate transaction warnings

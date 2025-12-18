@@ -105,11 +105,21 @@ class SettingsViewModel @Inject constructor(
             // Get theme separately (to avoid exceeding 5 flows limit)
             val themeFlow = preferencesRepository.getTheme()
 
-            // Get allow expenses without receipt separately (to avoid exceeding 5 flows limit)
-            val allowExpensesWithoutReceiptFlow = preferencesRepository.getAllowExpensesWithoutReceipt()
+            // Combine appearance flows (theme, dynamic color)
+            val appearanceSettings = combine(themeFlow, dynamicColorFlow) { theme, dynamicColor ->
+                AppearanceSettings(theme, dynamicColor)
+            }
 
-            // Combine all settings into UI state
-            combine(generalSettings, otherSettings, themeFlow, dynamicColorFlow, allowExpensesWithoutReceiptFlow) { general, other, theme, dynamicColor, allowExpensesWithoutReceipt ->
+            // Combine toggle flows (allow expenses without receipt, duplicate warning)
+            val toggleSettings = combine(
+                preferencesRepository.getAllowExpensesWithoutReceipt(),
+                preferencesRepository.getDuplicateWarningEnabled()
+            ) { allowExpensesWithoutReceipt, duplicateWarningEnabled ->
+                ToggleSettings(allowExpensesWithoutReceipt, duplicateWarningEnabled)
+            }
+
+            // Combine all settings into UI state (now only 4 flows)
+            combine(generalSettings, otherSettings, appearanceSettings, toggleSettings) { general, other, appearance, toggles ->
                 // Parse tax period start/end to extract month and day
                 val (startMonth, startDay) = parseTaxPeriod(general.taxPeriodStart)
                 val (endMonth, endDay) = parseTaxPeriod(general.taxPeriodEnd)
@@ -130,9 +140,10 @@ class SettingsViewModel @Inject constructor(
                     transactionReminderFrequency = other.reminderFrequency,
                     ocrEnabled = other.ocrEnabled,
                     dataRetentionYears = other.retentionYears,
-                    allowExpensesWithoutReceipt = allowExpensesWithoutReceipt,
-                    dynamicColorEnabled = dynamicColor,
-                    theme = theme,
+                    allowExpensesWithoutReceipt = toggles.allowExpensesWithoutReceipt,
+                    duplicateWarningEnabled = toggles.duplicateWarningEnabled,
+                    dynamicColorEnabled = appearance.dynamicColorEnabled,
+                    theme = appearance.theme,
                     appVersion = BuildConfig.VERSION_NAME,
                     isLoading = false
                 )
@@ -175,6 +186,16 @@ class SettingsViewModel @Inject constructor(
         val reminderFrequency: String,
         val ocrEnabled: Boolean,
         val retentionYears: Int
+    )
+
+    private data class AppearanceSettings(
+        val theme: String,
+        val dynamicColorEnabled: Boolean
+    )
+
+    private data class ToggleSettings(
+        val allowExpensesWithoutReceipt: Boolean,
+        val duplicateWarningEnabled: Boolean
     )
 
     /**
@@ -401,6 +422,15 @@ class SettingsViewModel @Inject constructor(
     }
 
     /**
+     * Set duplicate warning enabled/disabled (GLOBAL).
+     */
+    fun setDuplicateWarningEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setDuplicateWarningEnabled(enabled)
+        }
+    }
+
+    /**
      * Set theme preference.
      */
     fun setTheme(theme: String) {
@@ -530,6 +560,7 @@ data class SettingsUiState(
     val ocrEnabled: Boolean = true,
     val dataRetentionYears: Int = 6,
     val allowExpensesWithoutReceipt: Boolean = false,
+    val duplicateWarningEnabled: Boolean = true, // Show duplicate transaction warnings
     val dynamicColorEnabled: Boolean = false, // Material You dynamic colors (Android 12+)
     val theme: String = "auto",
     val appVersion: String = "",

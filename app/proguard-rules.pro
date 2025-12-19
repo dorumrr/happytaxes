@@ -53,6 +53,10 @@
 -keepattributes SourceFile,LineNumberTable
 # Make source file attribute deterministic (removes non-deterministic r8-map-id hash)
 -renamesourcefileattribute SourceFile
+# Disable R8 optimizations for reproducible builds
+# R8 optimizations are non-deterministic (especially Companion object handling)
+# This keeps shrinking (unused code removal) but disables optimization passes
+-dontoptimize
 # Keep Kotlin Companion objects to prevent non-deterministic <clinit> generation
 # This fixes R8 optimization non-determinism where Companion object static initializers
 # may or may not be generated depending on optimization decisions

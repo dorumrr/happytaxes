@@ -134,6 +134,10 @@ android {
             excludes += "META-INF/androidx.profileinstaller_profileinstaller.version"
             pickFirsts += listOf("META-INF/INDEX.LIST", "META-INF/io.netty.versions.properties")
         }
+        // Deterministic dex file generation for reproducible builds
+        dex {
+            useLegacyPackaging = false
+        }
     }
 
     // Rename APK output files to include version
